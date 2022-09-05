@@ -19,3 +19,4 @@ router.put("/:id", verifyAuth, ProjectController.update);
 router.delete("/:id", verifyAuth, ProjectController.delete);
 
 module.exports = router;
+
