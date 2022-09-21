@@ -4,11 +4,30 @@ const Project = require('../models/project.model');
 const { Task } = require('../models/task.model');
 const { isBoardOwner } = require('./shared.service');
 
+const mongoose = require('mongoose');
+
 const ERROR_RESPONSE = {
 	ok: false,
 };
 
 const isProjectOwner = async (projectId, userId) => !isFalsy(await Project.exists({ _id: projectId, userId }));
+
+const formatProject = (data) => {
+	let projectDetails = {};
+	Object.keys(data).forEach((key) => {
+		if (key !== 'boardInfo' && key !== 'taskInfo') projectDetails[key] = data[key];
+	});
+	const boards = Object.fromEntries(
+		data.boardInfo.map((board) => {
+			board.tasks = sortBy(
+				data.taskInfo.filter((task) => task.boardId?.toString() === board._id?.toString()),
+				'position',
+			);
+			return [board.position, board];
+		}),
+	);
+	return { ...projectDetails, boards };
+};
 
 exports.isProjectOwnerService = isProjectOwner;
 
@@ -26,32 +45,15 @@ exports.get = async function (userId) {
 
 exports.getOne = async function (projectId, userId) {
 	const projectOwner = await isProjectOwner(projectId, userId);
-
 	if (!projectOwner) return ERROR_RESPONSE;
 
 	try {
-		let boardData = {};
-		// TODO optimise the logic for fetching tasks
-		const [project, boards, tasks] = await Promise.all([
-			Project.findOne({ _id: projectId, userId }).lean(),
-			Board.find({ userId, projectId }).lean().sort({ position: 'asc' }),
-			Task.find({ user_id: userID, project_id: projectId }).lean(),
+		const projectDetails = await Project.aggregate([
+			{ $match: { userId: mongoose.Types.ObjectId(userId), _id: mongoose.Types.ObjectId(projectId) } },
+			{ $lookup: { from: 'boards', localField: '_id', foreignField: 'projectId', as: 'boardInfo' } },
+			{ $lookup: { from: 'tasks', localField: 'boardInfo._id', foreignField: 'boardId', as: 'taskInfo' } },
 		]);
-
-		if (boards?.length > 0) {
-			boards.forEach((board) => {
-				const boardTasks = sortBy(
-					tasks?.filter((task) => task.board_id.toString() === board._id.toString()),
-					'task_position',
-				);
-
-				boardData[board.board_position] = {
-					...board,
-					tasks: boardTasks,
-				};
-			});
-		}
-		return { ok: true, data: { ...project, boards: boardData } };
+		return { ok: true, data: formatProject(projectDetails[0]) };
 	} catch (error) {
 		console.log(error);
 		return ERROR_RESPONSE;
@@ -90,12 +92,13 @@ exports.update = async function (projectId, { name }, userId) {
 exports.delete = async function (projectId, userId) {
 	const projectOwner = await isProjectOwner(projectId, userId);
 	if (!projectOwner) return ERROR_RESPONSE;
-	// optimise the logic
+
 	try {
+		const boards = (await Board.find({ projectId, userId }, { _id: 1 }).lean()).map((b) => b._id);
 		await Promise.all([
-			Board.deleteMany({ projectId, user_id: userID }),
-			Task.deleteMany({ project_id: projectID, user_id: userID }),
-			Project.deleteOne({ _id: projectID, user_id: userID }),
+			Board.deleteMany({ projectId, userId }),
+			Task.deleteMany({ boardId: { $in: boards }, userId }),
+			Project.deleteOne({ _id: projectId, userId }),
 		]);
 		return {
 			ok: true,
@@ -110,6 +113,8 @@ exports.delete = async function (projectId, userId) {
 exports.saveChanges = async function (updatedTasks, deletedStack, userId, projectId) {
 	const projectOwner = await isProjectOwner(projectId, userId);
 	if (!projectOwner) return ERROR_RESPONSE;
+
+	// TODO - Look through this for anything missing
 
 	try {
 		await Promise.all(

@@ -4,20 +4,20 @@ const ERROR_RESPONSE = {
 	ok: false,
 };
 
-exports.create = async function ({ name, projectId }, userId) {
+exports.create = async function (projectId, { name }, userId) {
 	const projectOwner = await ProjectService.isProjectOwnerService(projectId, userId);
 	if (!projectOwner) return ERROR_RESPONSE;
 
 	try {
-		// TODO implement board position logic here
-		// const boardCount = await Board.find({
-		// 	userId,
-		// 	projectId,
-		// }).count();
+		// TODO: To be refactored with position schema
+		const boardCount = await Board.find({
+			userId,
+			projectId,
+		}).count();
 		const newBoard = await Board.create({
 			name,
 			projectId,
-			// board_position: boardCount > 0 ? boardCount + 1 : 1,
+			position: boardCount > 0 ? boardCount + 1 : 1,
 			userId,
 		});
 		return {
