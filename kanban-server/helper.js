@@ -40,6 +40,10 @@ const sortBy = (arr, field) => {
 	return arr;
 };
 
+const isArrayEmpty = (arr) => arr.length === 0;
+
+const isArrayNotEmpty = (arr) => !isArrayEmpty(arr);
+
 const isProduction = () => process.env.NODE_ENV === 'production';
 
 module.exports = {
@@ -54,4 +58,6 @@ module.exports = {
 	isEmpty,
 	sortBy,
 	isProduction,
+	isArrayEmpty,
+	isArrayNotEmpty,
 };

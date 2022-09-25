@@ -12,7 +12,7 @@ router.get('/:id', verifyAuth, ProjectController.getOne);
 
 router.post('/', verifyAuth, ProjectController.create);
 
-router.post('/save/:id', verifyAuth, ProjectController.saveChanges);
+router.put('/save/:id', verifyAuth, ProjectController.saveChanges);
 
 router.patch('/:id', verifyAuth, ProjectController.update);
 

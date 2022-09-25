@@ -1,4 +1,4 @@
-const { isFalsy, sortBy } = require('../helper');
+const { isFalsy, sortBy, isArrayNotEmpty } = require('../helper');
 const Board = require('../models/board.model');
 const Project = require('../models/project.model');
 const { Task } = require('../models/task.model');
@@ -114,30 +114,24 @@ exports.saveChanges = async function (updatedTasks, deletedStack, userId, projec
 	const projectOwner = await isProjectOwner(projectId, userId);
 	if (!projectOwner) return ERROR_RESPONSE;
 
-	// TODO - Look through this for anything missing
-
 	try {
 		await Promise.all(
 			updatedTasks?.map(async (task) => {
 				if (await isBoardOwner(userId, task?.boardId)) {
-					return Task.updateOne({ _id: task._id, userId, projectId }, task);
+					return Task.updateOne({ _id: task._id, userId }, task);
 				}
 			}),
 		);
-		if (deletedStack.hasOwnProperty('boards') && deletedStack?.boards.length > 0) {
-			await Promise.all(
-				deletedStack.boards.map(async (board, i) => {
-					i === 0 && (await Task.deleteMany({ boardId: board._id }));
-					return Board.deleteOne({ _id: board._id, userId });
-				}),
-			);
+		if (deletedStack['boards'] && isArrayNotEmpty(deletedStack.boards)) {
+			const boardIds = deletedStack.boards.map((b) => b._id);
+			await Promise.all([
+				Task.deleteMany({ boardId: { $in: boardIds }, userId }),
+				Board.deleteMany({ _id: { $in: boardIds }, userId }),
+			]);
 		}
-		if (deletedStack.hasOwnProperty('tasks') && deletedStack?.tasks.length > 0) {
-			await Promise.all(
-				deletedStack?.tasks?.map((task) => {
-					return Task.deleteOne({ _id: task._id, userId });
-				}),
-			);
+		if (deletedStack['tasks'] && isArrayNotEmpty(deletedStack.tasks)) {
+			const taskIds = deletedStack.tasks.map((t) => t._id);
+			await Task.deleteMany({ _id: { $in: taskIds }, userId });
 		}
 		return { ok: true, message: 'Saved changes successfully' };
 	} catch (e) {
