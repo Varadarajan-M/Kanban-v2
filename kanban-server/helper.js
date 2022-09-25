@@ -1,25 +1,25 @@
-const bcrypt = require("bcrypt");
+const bcrypt = require('bcrypt');
 
 const sendSuccessPayload = (res, payload, status) => {
-  res.status(status).json({
-    ok: true,
-    payload,
-  });
+	res.status(status).json({
+		ok: true,
+		payload,
+	});
 };
 
 const sendError = (res, err) => {
-  res.status(err.status).json({
-    ok: false,
-    error: {
-      message: err.message,
-    },
-  });
+	res.status(err.status).json({
+		ok: false,
+		error: {
+			message: err.message,
+		},
+	});
 };
 
 const throwError = (message, status) => {
-  const error = new Error(message);
-  error.status = status;
-  return error;
+	const error = new Error(message);
+	error.status = status;
+	return error;
 };
 
 // Bcrypt utils
@@ -36,22 +36,28 @@ const isFalsy = (val) => val == undefined || val == null;
 const isStrFalsy = (val) => isEmpty(val) || isFalsy(val);
 
 const sortBy = (arr, field) => {
-  arr.sort((a, b) => (a[[field]] ?? 0) - (b[[field]] ?? 0));
-  return arr;
+	arr.sort((a, b) => (a[field] ?? 0) - (b[field] ?? 0));
+	return arr;
 };
 
-const isProduction = () => process.env.NODE_ENV === "production";
+const isArrayEmpty = (arr) => arr.length === 0;
+
+const isArrayNotEmpty = (arr) => !isArrayEmpty(arr);
+
+const isProduction = () => process.env.NODE_ENV === 'production';
 
 module.exports = {
-  sendSuccessPayload,
-  sendError,
-  throwError,
-  isPasswordMatching,
-  hashPassword,
-  isSame,
-  isStrFalsy,
-  isFalsy,
-  isEmpty,
-  sortBy,
-  isProduction,
+	sendSuccessPayload,
+	sendError,
+	throwError,
+	isPasswordMatching,
+	hashPassword,
+	isSame,
+	isStrFalsy,
+	isFalsy,
+	isEmpty,
+	sortBy,
+	isProduction,
+	isArrayEmpty,
+	isArrayNotEmpty,
 };
