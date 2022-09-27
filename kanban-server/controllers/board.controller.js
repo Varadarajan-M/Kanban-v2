@@ -2,7 +2,7 @@ const BoardService = require('../services/board.service');
 const { sendSuccessPayload, throwError, sendError } = require('../helper');
 
 exports.create = async (req, res) => {
-	const newBoard = await BoardService.create(req?.params?.id, req.body, req?.user?.userID);
+	const newBoard = await BoardService.create(req?.params?.projectId, req.body, req?.user?.userID);
 	if (newBoard.ok) {
 		sendSuccessPayload(res, newBoard.board, 200);
 	} else {
@@ -12,7 +12,12 @@ exports.create = async (req, res) => {
 };
 
 exports.update = async (req, res) => {
-	const isBoardUpdated = await BoardService.update(req?.params?.id ?? -1, req.body ?? {}, req?.user?.userID);
+	const isBoardUpdated = await BoardService.update(
+		req?.params?.projectId ?? -1,
+		req.params.boardId ?? -1,
+		req.body ?? {},
+		req?.user?.userID,
+	);
 	if (isBoardUpdated?.ok) {
 		sendSuccessPayload(res, isBoardUpdated.message, 200);
 	} else {

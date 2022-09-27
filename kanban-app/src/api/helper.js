@@ -1,13 +1,4 @@
-import {
-  ADD_BOARD_URL,
-  ADD_NEW_TASK_URL,
-  BOARD_INFO_URL,
-  LOGIN_URL,
-  SAVE_CHANGES_URL,
-  SIGN_UP_URL,
-  UPDATE_BOARD_URL,
-  PROJECT_URL,
-} from './constants';
+import { LOGIN_URL, SIGN_UP_URL, PROJECT_URL, SAVE_PROJECT_URL, BOARD_URL, TASK_URL } from './constants';
 import { isStrNotFalsy } from '../util';
 
 // *Local Storage
@@ -29,128 +20,93 @@ export const setUserName = (v) => localStorage.setItem('authUser', v);
 // *http
 
 export const makeHttpReq = async (url, options = {}) => {
-  try {
-    const res = await fetch(url, options);
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.log(err);
-  }
+	try {
+		const res = await fetch(url, options);
+		const data = await res.json();
+		return data;
+	} catch (err) {
+		console.log(err);
+	}
 };
 
-export const makeHttpOptions = (
-  method = 'GET',
-  body = {},
-  authToken = null
-) => {
-  const options = {
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authToken !== null && { Authorization: `Bearer ${authToken}` }),
-    },
-    ...(method !== 'GET' && { body: JSON.stringify(body) }),
-  };
-  return options;
+export const makeHttpOptions = (method = 'GET', body = {}, authToken = null) => {
+	const options = {
+		method,
+		headers: {
+			'Content-Type': 'application/json',
+			...(authToken !== null && { Authorization: `Bearer ${authToken}` }),
+		},
+		...(method !== 'GET' && { body: JSON.stringify(body) }),
+	};
+	return options;
 };
 
 export const isResOk = (res) => res?.ok;
 
-// *Login service
+
+// *Required methods
 
 export const login = async (userCreds, setAuthState) => {
-  const res = await makeHttpReq(LOGIN_URL, makeHttpOptions('POST', userCreds));
-  if (isResOk(res)) {
-    setAuthState({
-      isAuthenticated: true,
-      user: {
-        email: res?.payload?.email,
-        username: res?.payload?.username,
-      },
-    });
-    setEmail(res?.payload?.email);
-    setToken(res?.payload?.token);
-    setUserName(res?.payload?.username);
-  }
-  return res;
+	const res = await makeHttpReq(LOGIN_URL, makeHttpOptions('POST', userCreds));
+	if (isResOk(res)) {
+		setAuthState({
+			isAuthenticated: true,
+			user: {
+				email: res?.payload?.email,
+				username: res?.payload?.username,
+			},
+		});
+		setEmail(res?.payload?.email);
+		setToken(res?.payload?.token);
+		setUserName(res?.payload?.username);
+	}
+	return res;
 };
-// *Signup service
 export const signup = async (userCreds) => {
-  const res = await makeHttpReq(
-    SIGN_UP_URL,
-    makeHttpOptions('POST', userCreds)
-  );
-  return res;
+	const res = await makeHttpReq(SIGN_UP_URL, makeHttpOptions('POST', userCreds));
+	return res;
 };
-
-// Get user board information
-
-export const getBoardInfo = async (accessToken) => {
-  const res = await makeHttpReq(
-    BOARD_INFO_URL,
-    makeHttpOptions('GET', {}, accessToken)
-  );
-  return res;
-};
-
-// Update Board Name
-
-export const updateBoard = async (id, value, accessToken) => {
-  const res = await makeHttpReq(
-    `${UPDATE_BOARD_URL}/${id}`,
-    makeHttpOptions(
-      'PATCH',
-      {
-        board_name: value,
-      },
-      accessToken
-    )
-  );
-  return res;
-};
-
-export const addBoard = async (projectId, boardDetails, accessToken) => {
-  const res = await makeHttpReq(
-    `${ADD_BOARD_URL}/${projectId}`,
-    makeHttpOptions('POST', boardDetails, accessToken)
-  );
-  return res;
-};
-
-export const saveAllChanges = async (payload, accessToken) => {
-  const res = await makeHttpReq(
-    SAVE_CHANGES_URL,
-    makeHttpOptions('PUT', payload, accessToken)
-  );
-  return res;
-};
-
-// task services
-
-export const addTask = async (task, accessToken) => {
-  const res = await makeHttpReq(
-    ADD_NEW_TASK_URL,
-    makeHttpOptions('POST', task, accessToken)
-  );
-  return res;
-};
-
-// GET ALL PROJECT DETAILS
 
 export const getAllProjects = async (accessToken) => {
-  const res = await makeHttpReq(
-    PROJECT_URL,
-    makeHttpOptions('GET', {}, accessToken)
-  );
-  return res;
+	const res = await makeHttpReq(PROJECT_URL, makeHttpOptions('GET', {}, accessToken));
+	return res;
 };
 
-// GET ONE PROJECT
-
 export const getOneProject = async (projectId, accessToken) => {
-  const res = await makeHttpReq(
-    `${PROJECT_URL}/${projectId}`,
-    makeHttpOptions('GET', {}, accessToken)
-  );
-  return res;
+	const res = await makeHttpReq(`${PROJECT_URL}/${projectId}`, makeHttpOptions('GET', {}, accessToken));
+	return res;
+};
+
+export const createProject = async (body, accessToken) => {
+	const res = await makeHttpReq(`${PROJECT_URL}`, makeHttpOptions('POST', body, accessToken));
+	return res;
+};
+
+export const updateProject = async (projectId, body, accessToken) => {
+	const res = await makeHttpReq(`${PROJECT_URL}/${projectId}`, makeHttpOptions('PATCH', body, accessToken));
+	return res;
+};
+
+export const saveProject = async (projectId, body, accessToken) => {
+	const res = await makeHttpReq(`${SAVE_PROJECT_URL}/${projectId}`, makeHttpOptions('PUT', body, accessToken));
+};
+
+export const deleteProject = async (projectId, accessToken) => {
+	const res = await makeHttpReq(`${PROJECT_URL}/${projectId}`, makeHttpOptions('DELETE', {}, accessToken));
+	return res;
+};
+
+export const createBoard = async (projectId, body, accessToken) => {
+	const res = await makeHttpReq(`${BOARD_URL}/${projectId}`, makeHttpOptions('POST', body, accessToken));
+	return res;
+};
+
+export const updateBoard = async (projectId, boardId, body, accessToken) => {
+	const res = await makeHttpReq(`${BOARD_URL}/${projectId}/${boardId}`, makeHttpOptions('PATCH', body, accessToken));
+	return res;
+};
+
+export const createTask = async (boardId, body, accessToken) => {
+	const res = await makeHttpReq(`${TASK_URL}/${boardId}`, makeHttpOptions('POST', body, accessToken));
+	return res;
 };

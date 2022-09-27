@@ -1,21 +1,14 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  getBoardInfo,
-  isResOk,
-  updateBoard,
-  getUser,
-  addBoard,
-  saveAllChanges,
-  addTask,
-  getAllProjects,
-  getOneProject,
+	isResOk,
+	getUser,
+	createBoard,
+	updateBoard,
+	getAllProjects,
+	getOneProject,
+	saveProject,
+	createTask,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty } from '../util';
@@ -25,219 +18,207 @@ import { useAuth } from './AuthContext';
 const BoardDataContext = createContext({});
 
 export const BoardDataContextProvider = ({ children }) => {
-  const [boardData, setBoardData] = useState({});
-  const [boardDataLoading, setBoardDataLoading] = useState(false);
-  const [saveState, setSaveState] = useState('disabled');
-  const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
-  const navigate = useNavigate();
-  const { performInstantUpdate } = useInstantUpdate(setBoardData);
+	const [boardData, setBoardData] = useState({});
+	const [boardDataLoading, setBoardDataLoading] = useState(false);
+	const [saveState, setSaveState] = useState('disabled');
+	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
+	const navigate = useNavigate();
+	const { performInstantUpdate } = useInstantUpdate(setBoardData);
 
-  const { clearAuthState } = useAuth();
+	const { clearAuthState } = useAuth();
 
-  // new
+	// new
 
-  const [projectDetails, setProjectDetails] = useState({});
+	const [projectDetails, setProjectDetails] = useState({});
 
-  const [projectList, setProjectList] = useState([]);
+	const [projectList, setProjectList] = useState([]);
 
-  const getProjectInfo = async (projectId) => {
-    console.log({ projectId });
-    setBoardDataLoading(true);
-    const res = await getOneProject(projectId, getUser());
-    if (isResOk(res)) {
-      setProjectDetails(res.payload);
-      setBoardDataLoading(false);
-    } else {
-      console.log('Response not okay');
-    }
-  };
+	const getProjectInfo = async (projectId) => {
+		setBoardDataLoading(true);
+		const res = await getOneProject(projectId, getUser());
+		if (isResOk(res)) {
+			setProjectDetails(res.payload);
+			setBoardDataLoading(false);
+		} else {
+			console.log('Response not okay');
+		}
+	};
 
-  const getProjectList = async () => {
-    const res = await getAllProjects(getUser());
-    if (isResOk(res) && !isArrayEmpty(res?.payload)) {
-      getProjectInfo(res?.payload[0]._id);
-      setProjectList(res.payload);
-    } else {
-      console.log('Something went wrong');
-    }
-  };
+	const getProjectList = async () => {
+		const res = await getAllProjects(getUser());
+		if (isResOk(res) && !isArrayEmpty(res?.payload)) {
+			getProjectInfo(res?.payload[0]._id);
+			setProjectList(res.payload);
+		} else {
+			clearAuthState();
+			navigate('/login', { replace: true });
+		}
+	};
 
-  // Board Methods
-  const getBoardInformation = useCallback(async () => {
-    setBoardDataLoading(true);
-    console.log('project Dets', await getAllProjects(getUser()));
-    console.log('Single project Dets', await getOneProject('', getUser()));
+	const deleteBoardInfo = useCallback((boardPosition) => {
+		setBoardData((b) => removeKey(b, boardPosition));
+		setSaveState('enabled');
+	}, []);
 
-    const res = await getBoardInfo(getUser());
-    if (isResOk(res)) {
-      setBoardData(res.payload);
-      setBoardDataLoading(false);
-    } else {
-      // clearAuthState();
-      // navigate('/login', { replace: true });
-    }
-  }, []);
+	const editBoardName = async (boardPosition, value) => {
+		if (isStrFalsy(value)) return;
+		const boardData = {
+			name: value,
+		};
+		const res = await updateBoard(projectDetails._id, projectDetails.boards[boardPosition]._id, boardData, getUser());
+		if (!res?.ok) {
+			alert(res?.error?.message);
+			return;
+		}
+		// performInstantUpdate(setValue(projectDetails, `boards.${boardPosition}.name`, value));
+	};
 
-  const deleteBoardInfo = useCallback((boardPosition) => {
-    setBoardData((b) => removeKey(b, boardPosition));
-    setSaveState('enabled');
-  }, []);
+	const addNewBoard = async (value) => {
+		if (isStrFalsy(value)) return;
+		const board = {
+			name: value,
+		};
+		const res = await createBoard(projectDetails._id, board, getUser());
 
-  const editBoardName = async (key, value) => {
-    if (isStrFalsy(value)) return;
-    const res = await updateBoard(boardData[[key]]._id, value, getUser());
-    if (!res?.ok) {
-      alert(res?.error?.message);
-      return;
-    }
-    performInstantUpdate(setValue(boardData, `${key}.board_name`, value));
-  };
+		if (isResOk(res)) {
+			setProjectDetails((p) => ({
+				...p,
+				boards: {
+					...p.boards,
+					[res?.payload?.position]: {
+						...res?.payload,
+						tasks: [],
+					},
+				},
+			}));
+		} else {
+			alert(res?.error?.message);
+		}
+	};
 
-  const addNewBoard = async (value) => {
-    if (isStrFalsy(value)) return;
-    const board = {
-      name: value,
-    };
-    const res = await addBoard(projectDetails._id, board, getUser());
+	const saveChanges = async () => {
+		const payload = { tasks: [], deletedStack };
+		setSaveState('saving');
+		Object.entries(projectDetails.boards).forEach(([key, board]) => {
+			const tasks = board.tasks.reduce((ac, task, index) => [...ac, { ...task, position: index }], []);
+			payload.tasks.push(tasks);
+		});
+		payload.tasks = payload.tasks.flat();
 
-    if (isResOk(res)) {
-      setProjectDetails((p) => ({
-        ...p,
-        boards: {
-          ...p.boards,
-          [res?.payload?.position]: {
-            ...res?.payload,
-            tasks: [],
-          },
-        },
-      }));
-    } else {
-      alert(res?.error?.message);
-    }
-  };
+		const projectId = projectDetails._id;
+		const res = await saveProject(projectId, payload, getUser());
+		if (isResOk(res)) setSaveState('disabled');
+	};
 
-  const saveChanges = async () => {
-    const payload = { tasks: [], deletedStack };
-    setSaveState('saving');
-    Object.entries(boardData).forEach(([key, board]) => {
-      const tasks = board.tasks.reduce(
-        (ac, task, index) => [...ac, { ...task, task_position: index }],
-        []
-      );
-      payload.tasks.push(tasks);
-    });
-    payload.tasks = payload.tasks.flat();
+	// task methods
 
-    const res = await saveAllChanges(payload, getUser());
-    if (isResOk(res)) setSaveState('disabled');
-  };
+	const addNewTask = async (task, boardPosition) => {
+		const newTask = {
+			item: task,
+		};
+		const res = await createTask(projectDetails.boards[boardPosition]._id, newTask, getUser());
+		if (isResOk(res)) {
+			setProjectDetails((project) => ({
+				...project,
+				boards: {
+					...project.boards,
+					[boardPosition]: {
+						...project.boards[boardPosition],
+						tasks: [...project.boards[boardPosition]?.tasks, res.payload],
+					},
+				},
+			}));
+		}
+	};
 
-  // task methods
+	const deleteTask = (task, boardPosition) => {
+		setBoardData((b) => ({
+			...b,
+			[boardPosition]: {
+				...b[boardPosition],
+				tasks: b[boardPosition].tasks.filter((t) => t._id !== task._id),
+			},
+		}));
+		setSaveState('enabled');
+	};
 
-  const addNewTask = async (task, boardPosition) => {
-    const newTask = {
-      task_item: task,
-      board_id: boardData[boardPosition]._id,
-    };
-    const res = await addTask(newTask, getUser());
-    if (isResOk(res)) {
-      setBoardData((boards) => ({
-        ...boards,
-        [boardPosition]: {
-          ...boards[boardPosition],
-          tasks: [...boards[boardPosition]?.tasks, res?.payload],
-        },
-      }));
-    }
-  };
+	const editTask = (boardPosition, taskId, value) => {
+		if (isStrFalsy(value)) return;
 
-  const deleteTask = (task, boardPosition) => {
-    setBoardData((b) => ({
-      ...b,
-      [boardPosition]: {
-        ...b[boardPosition],
-        tasks: b[boardPosition].tasks.filter((t) => t._id !== task._id),
-      },
-    }));
-    setSaveState('enabled');
-  };
+		setProjectDetails((project) => ({
+			...project,
+			boards: {
+				...project.boards,
+				[boardPosition]: {
+					...project.boards[boardPosition],
+					tasks: project.boards[boardPosition].tasks.map((task) =>
+						task._id === taskId ? { ...task, item: value } : task,
+					),
+				},
+			},
+		}));
+		setSaveState('enabled');
+	};
 
-  const editTask = (boardPosition, taskId, value) => {
-    if (isStrFalsy(value)) return;
+	const updateListOrder = (key, taskArray) => {
+		setBoardData((b) => ({
+			...b,
+			[key]: {
+				...b[key],
+				tasks: taskArray,
+			},
+		}));
+		setSaveState('enabled');
+	};
 
-    setBoardData((board) => ({
-      ...board,
-      [boardPosition]: {
-        ...board[boardPosition],
-        tasks: board[boardPosition].tasks.map((t) =>
-          t._id === taskId ? { ...t, task_item: value } : t
-        ),
-      },
-    }));
-    setSaveState('enabled');
-  };
+	useEffect(() => {
+		const beforeUnloadListener = (event) => {
+			event.preventDefault();
+			return (event.returnValue = 'Are you sure you want to exit?');
+		};
+		if (saveState === 'enabled') {
+			window.addEventListener('beforeunload', beforeUnloadListener, {
+				capture: true,
+			});
+		}
 
-  const updateListOrder = (key, taskArray) => {
-    setBoardData((b) => ({
-      ...b,
-      [key]: {
-        ...b[key],
-        tasks: taskArray,
-      },
-    }));
-    setSaveState('enabled');
-  };
+		if (saveState === 'disabled') {
+			setDeletedStack({ boards: [], tasks: [] });
+		}
 
-  useEffect(() => {
-    const beforeUnloadListener = (event) => {
-      event.preventDefault();
-      return (event.returnValue = 'Are you sure you want to exit?');
-    };
-    if (saveState === 'enabled') {
-      window.addEventListener('beforeunload', beforeUnloadListener, {
-        capture: true,
-      });
-    }
+		return () =>
+			window.removeEventListener('beforeunload', beforeUnloadListener, {
+				capture: true,
+			});
+	}, [saveState]);
 
-    if (saveState === 'disabled') {
-      setDeletedStack({ boards: [], tasks: [] });
-    }
+	return (
+		<BoardDataContext.Provider
+			value={{
+				boardDataLoading,
+				deleteBoardInfo,
+				editBoardName,
+				addNewBoard,
+				saveState,
+				setSaveState,
+				deletedStack,
+				setDeletedStack,
+				saveChanges,
+				addNewTask,
+				deleteTask,
+				editTask,
+				updateListOrder,
 
-    return () =>
-      window.removeEventListener('beforeunload', beforeUnloadListener, {
-        capture: true,
-      });
-  }, [saveState]);
+				// new properties
 
-  return (
-    <BoardDataContext.Provider
-      value={{
-        boardData,
-        getBoardInformation,
-        boardDataLoading,
-        deleteBoardInfo,
-        editBoardName,
-        addNewBoard,
-        saveState,
-        setSaveState,
-        deletedStack,
-        setDeletedStack,
-        saveChanges,
-        addNewTask,
-        deleteTask,
-        editTask,
-        updateListOrder,
-
-        // new properties
-
-        getProjectInfo,
-        getProjectList,
-        projectDetails,
-      }}
-    >
-      {children}
-    </BoardDataContext.Provider>
-  );
+				getProjectInfo,
+				getProjectList,
+				projectDetails,
+			}}
+		>
+			{children}
+		</BoardDataContext.Provider>
+	);
 };
 
 export const useBoardData = () => useContext(BoardDataContext);
