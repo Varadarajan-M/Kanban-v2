@@ -1,48 +1,75 @@
 $navTextColor: rgba(255, 255, 255, 0.75);
-.navbar {
+
+.navbar__wrapper {
 	position: fixed;
 	top: 0;
 	left: 0;
-	background-color: black;
 	width: 100%;
-	padding: 1rem;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
 	z-index: 1;
 
-	button:disabled {
-		opacity: 0.4;
-		pointer-events: none;
-		background-color: darkslategray;
-	}
+	.title {
+		text-align: center;
+		background: #09090a;
+		padding: 1rem;
 
-	.nav__brand {
-		color: white;
-		line-height: 20px;
-		font-size: 20px;
-		font-weight: 300;
+		span {
+			color: white;
+			line-height: 20px;
+			font-size: 16px;
+			letter-spacing: 2px;
+			font-weight: 300;
+			text-transform: capitalize;
+		}
 	}
-	.nav__buttons {
+	.navbar {
+		background-color: #100e0e;
+		padding: 0.5rem;
 		display: flex;
-		flex-wrap: wrap;
-		justify-content: flex-end;
-		button {
-			color: $navTextColor;
-			margin: 0.5rem;
-			height: 30px;
-			border-radius: 5px;
-			border: none;
-			cursor: pointer;
-			outline: none;
-			padding-inline: 0.5rem;
-			font-weight: 700;
-			&:hover {
-				color: #fff;
-				transform: scale(1.023);
+		justify-content: space-between;
+		align-items: center;
+
+		button:disabled {
+			opacity: 0.4;
+			pointer-events: none;
+			background-color: darkslategray;
+		}
+
+		.navbar__project-select {
+			select {
+				background-color: inherit;
+				width: 150px;
+				color: white;
+				border: none;
+				padding-bottom: 5px;
+				margin-left: 10px;
+				border-bottom: 2px solid #2ea043;
+				option {
+					padding: 0.5rem;
+					background-color: black;
+				}
 			}
-			&:nth-child(2) {
-				background-color: #2ea043;
+		}
+		.nav__buttons {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: flex-end;
+			button {
+				color: $navTextColor;
+				margin: 0.5rem;
+				height: 30px;
+				border-radius: 5px;
+				border: none;
+				cursor: pointer;
+				outline: none;
+				padding-inline: 0.5rem;
+				font-weight: 700;
+				&:hover {
+					color: #fff;
+					transform: scale(1.023);
+				}
+				&:nth-child(2) {
+					background-color: #2ea043;
+				}
 			}
 		}
 	}
@@ -59,7 +86,6 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			}
 			button::after {
 				content: ' changes';
-				// margin-right: 10px;
 			}
 		}
 	}
@@ -78,7 +104,6 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			width: 100%;
 			z-index: 1;
 			background-color: black;
-			// text-align: right;
 			button {
 				background-color: #202429;
 				width: 60px;

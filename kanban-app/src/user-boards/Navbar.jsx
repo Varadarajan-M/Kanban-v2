@@ -17,31 +17,35 @@ const Navbar = () => {
 	const isSaveDisabled = saveState === 'disabled';
 	const isSaving = saveState === 'saving';
 	return (
-		<nav className='navbar'>
-			<div className='nav__brand'>
-				<span>{`${username ?? 'User'}'s`} Kanban</span>
+		<div className='navbar__wrapper'>
+			<div className='title'>
+				<span>{username ?? 'User'} / Kanban App</span>
 			</div>
-
-			<div className='nav__buttons'>
-				<div className='nav__save_btn'>
+			<nav className='navbar'>
+				<div className='navbar__project-select'>
+					<select>
+						<option value='My Projects'>My Projects</option>
+						<option value='Shared Projects'>Shared Projects</option>
+					</select>
+				</div>
+				<div className='nav__buttons'>
+					<div className='nav__save_btn'>
+						<button disabled={isSaveDisabled || isSaving} onClick={saveChanges}>
+							{isSaving ? 'Saving' : 'Save'}
+						</button>
+					</div>
 					<button
-						disabled={isSaveDisabled || isSaving}
-						onClick={saveChanges}
+						onClick={() => {
+							clearAuthState();
+							localStorage.clear();
+							navigate('/');
+						}}
 					>
-						{isSaving ? 'Saving' : 'Save'}
+						Logout
 					</button>
 				</div>
-				<button
-					onClick={() => {
-						clearAuthState();
-						localStorage.clear();
-						navigate('/');
-					}}
-				>
-					Logout
-				</button>
-			</div>
-		</nav>
+			</nav>
+		</div>
 	);
 };
 

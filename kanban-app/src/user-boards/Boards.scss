@@ -3,6 +3,7 @@
 	display: flex;
 	gap: 15px;
 	overflow-x: scroll;
+	margin: 150px 0;
 
 	.board {
 		padding: 1rem 0;
@@ -13,7 +14,6 @@
 		background-color: #010409;
 		border-radius: 5px;
 		border: 1.5px solid #30363d;
-		margin: 100px 0;
 		&:focus {
 			border: 2px solid #58a6ff;
 			box-shadow: 3px 4px 4px 3px rgb(32 19 113 / 34%);
