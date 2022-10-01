@@ -52,7 +52,10 @@ const AuthForm = ({ mode, onSubmit, isProcessingReq }) => {
 				<input id='password' type='password' ref={passwordRef} placeholder='Password' required autoComplete='off' />
 			</div>
 			<button disabled={isProcessingReq} type='submit'>
-				{isLogin ? (isProcessingReq ? 'Signing in...' : 'Sign in') : isProcessingReq ? 'Signing up...' : 'Sign up'}
+				<span className='mr-2'>
+					{isLogin ? (isProcessingReq ? 'Signing in...' : 'Sign in') : isProcessingReq ? 'Signing up...' : 'Sign up'}
+				</span>
+				{isProcessingReq && <span className='ml-2 loading' />}
 			</button>
 		</form>
 	);

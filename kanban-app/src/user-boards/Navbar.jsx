@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBoardData } from '../context/BoardDataContext';
 import { useAuth } from './../context/AuthContext';
+
 import './Navbar.scss';
 
 const Navbar = () => {
@@ -22,12 +23,11 @@ const Navbar = () => {
 				<span>{username ?? 'User'} / Kanban App</span>
 			</div>
 			<nav className='navbar'>
-				<div className='navbar__project-select'>
-					<select>
-						<option value='My Projects'>My Projects</option>
-						<option value='Shared Projects'>Shared Projects</option>
-					</select>
-				</div>
+				<select className='custom-select'>
+					<option value='My Projects'>My Projects</option>
+					<option value='Shared Projects'>Shared Projects</option>
+				</select>
+
 				<div className='nav__buttons'>
 					<div className='nav__save_btn'>
 						<button disabled={isSaveDisabled || isSaving} onClick={saveChanges}>

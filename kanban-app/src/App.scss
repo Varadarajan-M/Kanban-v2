@@ -10,6 +10,17 @@ html {
 	height: 100vh;
 	width: 100%;
 	color: #c9d1d9;
+	font-size: unset !important;
+}
+body {
+	background: inherit;
+	color: unset;
+	font-size: unset;
+}
+
+button {
+	font-family: unset;
+	font-size: unset;
 }
 ::-webkit-scrollbar {
 	display: none;
@@ -43,6 +54,26 @@ html {
 	transform: scale(1.05);
 }
 
+.custom-select {
+	background-color: inherit;
+	width: 234px;
+	color: white;
+	border: none;
+	padding-bottom: 5px;
+	margin-left: 10px;
+	border-bottom: 2px solid #2ea043;
+	option {
+		padding: 0.5rem;
+		background-color: black;
+	}
+}
+
+.loading::after {
+	margin-top: -0.3rem;
+	border: 0.1rem solid #ffffff;
+	border-right-color: transparent;
+	border-top-color: transparent;
+}
 .lds-ellipsis {
 	display: inline-block;
 	position: absolute;

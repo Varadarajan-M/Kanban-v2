@@ -27,7 +27,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-
+		flex-wrap: nowrap;
 		button:disabled {
 			opacity: 0.4;
 			pointer-events: none;

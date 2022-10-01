@@ -21,6 +21,8 @@ export const BoardDataContextProvider = ({ children }) => {
 	const [boardDataLoading, setBoardDataLoading] = useState(false);
 	const [saveState, setSaveState] = useState('disabled');
 	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
+	const [show, setShow] = useState(true);
+
 	const navigate = useNavigate();
 
 	const { clearAuthState } = useAuth();
@@ -208,6 +210,8 @@ export const BoardDataContextProvider = ({ children }) => {
 	return (
 		<BoardDataContext.Provider
 			value={{
+				setShow,
+				show,
 				boardDataLoading,
 				deleteBoardInfo,
 				editBoardName,

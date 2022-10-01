@@ -3,7 +3,8 @@
 	display: flex;
 	gap: 15px;
 	overflow-x: scroll;
-	margin: 150px 0;
+	margin: 150px 20px 40px 200px;
+	transition: margin-left 0.2s ease-in;
 
 	.board {
 		padding: 1rem 0;
@@ -29,6 +30,8 @@
 			.board__left {
 				display: flex;
 				gap: 7px;
+				align-items: center;
+				word-break: break-all;
 
 				.board__items-length {
 					display: flex;

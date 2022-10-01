@@ -32,6 +32,7 @@ const Boards = () => {
 		getProjectList,
 		projectDetails,
 		setProjectDetails,
+		show,
 	} = useBoardData();
 
 	const onAddIconClick = (index) => toggleElementFromSet(activeBoardIndexes, index, setActiveBoardIndexes);
@@ -154,7 +155,7 @@ const Boards = () => {
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
-			<div className='boards-wrapper'>
+			<div className='boards-wrapper' style={{ marginLeft: show ? '275px' : '35px' }}>
 				{!boardDataLoading ? (
 					<Fragment>
 						{Object.entries(projectDetails?.boards ?? {}).map(([boardPos, column], index) => {
