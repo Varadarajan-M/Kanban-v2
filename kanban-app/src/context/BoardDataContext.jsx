@@ -228,6 +228,7 @@ export const BoardDataContextProvider = ({ children }) => {
 				getProjectInfo,
 				getProjectList,
 				projectDetails,
+				projectList,
 			}}
 		>
 			{children}

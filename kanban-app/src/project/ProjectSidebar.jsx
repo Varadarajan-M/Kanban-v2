@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBoardData } from '../context/BoardDataContext';
 import './ProjectSidebar.scss';
 
 const ProjectSidebar = () => {
-	const { show, setShow } = useBoardData();
+	const { show, setShow, getProjectList, projectList, getProjectInfo, projectDetails } = useBoardData();
+	useEffect(() => {
+		getProjectList();
+	}, []);
+
 	return (
 		<aside className='project__sidebar' style={{ left: show ? 0 : '-215px' }}>
 			<div className='search d-flex '>
@@ -18,14 +22,18 @@ const ProjectSidebar = () => {
 					{show ? 'arrow_back_ios' : 'arrow_forward_ios'}
 				</span>
 			</div>
-
-			<span>Sidebar </span>
-			<span>Sidebar </span>
-			<span>Sidebar </span>
-			<span>Sidebar </span>
-			<span>Sidebar </span>
-			<span>Sidebar </span>
-			<span>Sidebar </span>
+			<div className='project__list'>
+				{projectList?.map((item) => (
+					<p
+						style={{ cursor: 'pointer', color: item._id === projectDetails._id ? 'red' : 'white' }}
+						onClick={() => getProjectInfo(item._id)}
+						key={item._id}
+					>
+						{item.name}
+					</p>
+				))}
+			</div>
+			
 		</aside>
 	);
 };

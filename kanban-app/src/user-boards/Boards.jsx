@@ -149,9 +149,7 @@ const Boards = () => {
 		}
 	};
 
-	useEffect(() => {
-		getProjectList();
-	}, []);
+	
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
