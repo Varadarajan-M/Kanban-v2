@@ -10,14 +10,14 @@ const ProjectSidebar = () => {
 
 	return (
 		<aside className='project__sidebar' style={{ left: show ? 0 : '-215px' }}>
-			<div className='search d-flex '>
-				<input type='text' placeholder='search' style={{ marginRight: '15px' }} />
+			<div className='search'>
+				<input type='text' placeholder='Search Projects...' />
 				<span
 					title={show ? 'Hide' : 'Show'}
 					role='button'
 					onClick={() => setShow(!show)}
-					className='material-symbols-outlined'
-					style={{ cursor: 'pointer', marginLeft: !show ? '-5px' : 0 }}
+					className='material-symbols-outlined expand__collapse'
+					style={{ marginLeft: !show ? '-9px' : 'auto' }}
 				>
 					{show ? 'arrow_back_ios' : 'arrow_forward_ios'}
 				</span>
@@ -33,7 +33,6 @@ const ProjectSidebar = () => {
 					</p>
 				))}
 			</div>
-			
 		</aside>
 	);
 };
