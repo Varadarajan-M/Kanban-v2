@@ -15,26 +15,39 @@
 		max-height: 70%;
 		overflow: auto;
 	}
+
 	.search {
 		display: grid;
 		grid-template-columns: 90% 10%;
 		gap: 23px;
 		width: 100%;
 
-		input {
-			height: 30px;
-			padding: 3px;
-			height: 30px;
-			padding: 3px;
-			border: 1.5px solid #30363d;
-			border-radius: 3px;
-			background: inherit;
-			color: #c9d1d9;
+		.has-icon-right {
+			input {
+				height: 30px;
+				padding: 3px;
+				height: 30px;
+				padding: 3px;
+				border: 1.5px solid #30363d;
+				border-radius: 5px;
+				background: inherit;
+				color: #c9d1d9;
+
+
+			}
+
+			span {
+				position: absolute;
+				right: 0.6rem;
+				top: 0.6rem;
+			}
 		}
+
 		span {
 			margin: auto;
 			cursor: pointer;
 			color: #2ea043;
+
 		}
 	}
 }
