@@ -133,3 +133,15 @@ button {
 		transform: translate(24px, 0);
 	}
 }
+
+.modal {
+	backdrop-filter: blur(1px);
+}
+
+.modal-overlay {
+	background: rgb(20 20 20 / 64%) !important;
+}
+
+.modal-container {
+	background: #010409 !important;
+}

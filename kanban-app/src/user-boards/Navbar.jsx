@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Modal from '../common/Modal';
 import { useBoardData } from '../context/BoardDataContext';
+import ProjectForm from '../project/ProjectForm';
+import Modals from '../project/ProjectModals';
 import { useAuth } from './../context/AuthContext';
 
 import './Navbar.scss';
@@ -12,8 +15,17 @@ const Navbar = () => {
 		},
 		clearAuthState,
 	} = useAuth();
-	const { saveState, saveChanges } = useBoardData();
+	const { saveState, saveChanges, projectDetails } = useBoardData();
 	const navigate = useNavigate();
+
+	const [addOpen, setAddOpen] = useState(false);
+	const [editOpen, setEditOpen] = useState(false);
+
+	const closeAddProjectModal = () => setAddOpen(false);
+	const openAddProjectModal = () => setAddOpen(true);
+
+	const closeEditProjectModal = () => setEditOpen(false);
+	const openEditProjectModal = () => setEditOpen(true);
 
 	const isSaveDisabled = saveState === 'disabled';
 	const isSaving = saveState === 'saving';
@@ -29,6 +41,12 @@ const Navbar = () => {
 				</select>
 
 				<div className='nav__buttons'>
+					<button className='btn btn-success' onClick={openAddProjectModal}>
+						New
+					</button>
+					<button className='btn btn-success' onClick={openEditProjectModal}>
+						Edit
+					</button>
 					<div className='nav__save_btn'>
 						<button disabled={isSaveDisabled || isSaving} onClick={saveChanges}>
 							{isSaving ? 'Saving' : 'Save'}
@@ -37,7 +55,6 @@ const Navbar = () => {
 					<button
 						onClick={() => {
 							clearAuthState();
-							localStorage.clear();
 							navigate('/');
 						}}
 					>
@@ -45,6 +62,24 @@ const Navbar = () => {
 					</button>
 				</div>
 			</nav>
+
+			<Modals.AddProjectModal
+				open={addOpen}
+				onBackdropClick={closeAddProjectModal}
+				title={'Create Project'}
+				primaryButton={'Create'}
+				secondaryButton={'Discard'}
+				onSecondaryClick={closeAddProjectModal}
+			/>
+			<Modals.EditProjectModal
+				open={editOpen}
+				onBackdropClick={closeEditProjectModal}
+				title={`Edit ${projectDetails.name}`}
+				primaryButton={'Update'}
+				secondaryButton={'Discard'}
+				onSecondaryClick={closeEditProjectModal}
+				defaultValues={{ name: projectDetails.name }}
+			/>
 		</div>
 	);
 };

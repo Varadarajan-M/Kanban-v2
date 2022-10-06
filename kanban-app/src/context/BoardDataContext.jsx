@@ -9,6 +9,8 @@ import {
 	getOneProject,
 	saveProject,
 	createTask,
+	createProject,
+	updateProject,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty } from '../util';
@@ -33,6 +35,21 @@ export const BoardDataContextProvider = ({ children }) => {
 	const { performInstantUpdate } = useInstantUpdate(setProjectDetails);
 
 	const [projectList, setProjectList] = useState([]);
+
+	const addProject = async (project) => {
+		if (!project.name) return;
+		const res = await createProject(project, getUser());
+		if (isResOk(res)) {
+			setProjectList((p) => [res.payload, ...p]);
+		}
+	};
+	const editProject = async (project) => {
+		if (!project.name) return;
+		const res = await updateProject(projectDetails._id, project, getUser());
+		if (isResOk(res)) {
+			setProjectList((proj) => proj.map((p) => (p._id === projectDetails._id ? { ...p, name: project?.name } : p)));
+		}
+	};
 
 	const getProjectInfo = async (projectId) => {
 		setBoardDataLoading(true);
@@ -229,6 +246,8 @@ export const BoardDataContextProvider = ({ children }) => {
 				getProjectList,
 				projectDetails,
 				projectList,
+				addProject,
+				editProject,
 			}}
 		>
 			{children}
