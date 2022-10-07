@@ -1,8 +1,9 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import {
 	isResOk,
-	getUser,
+	getUserToken,
 	createBoard,
 	updateBoard,
 	getAllProjects,
@@ -13,57 +14,50 @@ import {
 	updateProject,
 } from '../api/helper';
 
-import { isStrFalsy, isArrayEmpty } from '../util';
-import { removeKey, setValue, useInstantUpdate } from './../user-boards/helper';
-import { useAuth } from './AuthContext';
+import { isStrFalsy, isArrayEmpty, removeKey, setValue } from '../lib';
+import { useInstantUpdate, useAuth, useUI } from '../hooks';
 
-const BoardDataContext = createContext({});
+export const ProjectContext = createContext({});
 
-export const BoardDataContextProvider = ({ children }) => {
-	const [boardDataLoading, setBoardDataLoading] = useState(false);
+const ProjectContextProvider = ({ children }) => {
+	const [projectList, setProjectList] = useState([]);
+	const [projectDetails, setProjectDetails] = useState({});
 	const [saveState, setSaveState] = useState('disabled');
 	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
-	const [show, setShow] = useState(true);
 
 	const navigate = useNavigate();
-
+	const { startLoading, stopLoading } = useUI();
 	const { clearAuthState } = useAuth();
-
-	// new
-
-	const [projectDetails, setProjectDetails] = useState({});
 	const { performInstantUpdate } = useInstantUpdate(setProjectDetails);
-
-	const [projectList, setProjectList] = useState([]);
 
 	const addProject = async (project) => {
 		if (!project.name) return;
-		const res = await createProject(project, getUser());
+		const res = await createProject(project, getUserToken());
 		if (isResOk(res)) {
 			setProjectList((p) => [res.payload, ...p]);
 		}
 	};
 	const editProject = async (project) => {
 		if (!project.name) return;
-		const res = await updateProject(projectDetails._id, project, getUser());
+		const res = await updateProject(projectDetails._id, project, getUserToken());
 		if (isResOk(res)) {
 			setProjectList((proj) => proj.map((p) => (p._id === projectDetails._id ? { ...p, name: project?.name } : p)));
 		}
 	};
 
 	const getProjectInfo = async (projectId) => {
-		setBoardDataLoading(true);
-		const res = await getOneProject(projectId, getUser());
+		startLoading();
+		const res = await getOneProject(projectId, getUserToken());
 		if (isResOk(res)) {
 			setProjectDetails(res.payload);
-			setBoardDataLoading(false);
+			stopLoading();
 		} else {
 			console.log('Response not okay');
 		}
 	};
 
 	const getProjectList = async () => {
-		const res = await getAllProjects(getUser());
+		const res = await getAllProjects(getUserToken());
 		if (isResOk(res)) {
 			if (!isArrayEmpty(res?.payload)) {
 				getProjectInfo(res?.payload[0]._id);
@@ -88,13 +82,11 @@ export const BoardDataContextProvider = ({ children }) => {
 		const boardData = {
 			name: value,
 		};
-		const res = await updateBoard(projectDetails._id, projectDetails.boards[boardPosition]._id, boardData, getUser());
+		const res = await updateBoard(projectDetails._id, projectDetails.boards[boardPosition]._id, boardData, getUserToken());
 		if (!res?.ok) {
 			alert(res?.error?.message);
 			return;
 		}
-
-		//TODO look into this
 		performInstantUpdate(setValue(projectDetails, `boards.${boardPosition}.name`, value));
 	};
 
@@ -103,7 +95,7 @@ export const BoardDataContextProvider = ({ children }) => {
 		const board = {
 			name: value,
 		};
-		const res = await createBoard(projectDetails._id, board, getUser());
+		const res = await createBoard(projectDetails._id, board, getUserToken());
 
 		if (isResOk(res)) {
 			setProjectDetails((p) => ({
@@ -131,7 +123,7 @@ export const BoardDataContextProvider = ({ children }) => {
 		payload.tasks = payload.tasks.flat();
 
 		const projectId = projectDetails._id;
-		const res = await saveProject(projectId, payload, getUser());
+		const res = await saveProject(projectId, payload, getUserToken());
 
 		if (isResOk(res)) setSaveState('disabled');
 	};
@@ -142,7 +134,7 @@ export const BoardDataContextProvider = ({ children }) => {
 		const newTask = {
 			item: task,
 		};
-		const res = await createTask(projectDetails.boards[boardPosition]._id, newTask, getUser());
+		const res = await createTask(projectDetails.boards[boardPosition]._id, newTask, getUserToken());
 		if (isResOk(res)) {
 			setProjectDetails((project) => ({
 				...project,
@@ -225,11 +217,8 @@ export const BoardDataContextProvider = ({ children }) => {
 	}, [saveState]);
 
 	return (
-		<BoardDataContext.Provider
+		<ProjectContext.Provider
 			value={{
-				setShow,
-				show,
-				boardDataLoading,
 				deleteBoardInfo,
 				editBoardName,
 				addNewBoard,
@@ -251,8 +240,8 @@ export const BoardDataContextProvider = ({ children }) => {
 			}}
 		>
 			{children}
-		</BoardDataContext.Provider>
+		</ProjectContext.Provider>
 	);
 };
 
-export const useBoardData = () => useContext(BoardDataContext);
+export default ProjectContextProvider;

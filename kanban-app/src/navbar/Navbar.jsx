@@ -1,25 +1,23 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Modal from '../common/Modal';
-import { useBoardData } from '../context/BoardDataContext';
-import ProjectForm from '../project/ProjectForm';
+import { useProjectData } from '../hooks';
 import Modals from '../project/ProjectModals';
-import { useAuth } from './../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 import './Navbar.scss';
 
 const Navbar = () => {
+	const [addOpen, setAddOpen] = useState(false);
+	const [editOpen, setEditOpen] = useState(false);
+
 	const {
 		authState: {
 			user: { username },
 		},
 		clearAuthState,
 	} = useAuth();
-	const { saveState, saveChanges, projectDetails } = useBoardData();
+	const { saveState, saveChanges, projectDetails } = useProjectData();
 	const navigate = useNavigate();
-
-	const [addOpen, setAddOpen] = useState(false);
-	const [editOpen, setEditOpen] = useState(false);
 
 	const closeAddProjectModal = () => setAddOpen(false);
 	const openAddProjectModal = () => setAddOpen(true);
@@ -55,7 +53,7 @@ const Navbar = () => {
 					<button
 						onClick={() => {
 							clearAuthState();
-							navigate('/');
+							navigate('/', { replace: true });
 						}}
 					>
 						Logout

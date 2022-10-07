@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Modal from '../common/Modal';
-import { useBoardData } from '../context/BoardDataContext';
-import { isNotFalsy } from '../util';
+import { useProjectData } from '../hooks';
+import { isNotFalsy } from '../lib';
 import { ProjectForm } from './ProjectForm';
 
 // HOC which provides the project details
@@ -22,7 +22,7 @@ const withProjectDetails = (Component) => {
 };
 
 const AddProjectModal = ({ project, clearValue, changeHandler, ...restProps }) => {
-	const { addProject } = useBoardData();
+	const { addProject } = useProjectData();
 	const onAdd = () => {
 		addProject(project);
 		clearValue('name');
@@ -37,7 +37,7 @@ const AddProjectModal = ({ project, clearValue, changeHandler, ...restProps }) =
 };
 
 const EditProjectModal = ({ project, clearValue, changeHandler, ...restProps }) => {
-	const { editProject } = useBoardData();
+	const { editProject } = useProjectData();
 	const onEdit = () => {
 		editProject(project);
 		clearValue('name');

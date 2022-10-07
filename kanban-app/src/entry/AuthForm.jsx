@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { isStrNotFalsy } from '../util';
+import { isStrNotFalsy } from '../lib';
 
 const AuthForm = ({ mode, onSubmit, isProcessingReq }) => {
 	const usernameRef = useRef(null);

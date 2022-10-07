@@ -1,6 +1,6 @@
 import React from 'react';
 import './TaskCard.scss';
-import Icon from './../common/Icon';
+import Icon from '../common/Icon';
 
 
 const TaskCard = ({ taskItem, onEditIconClick, onDeleteIconClick, isEditing, changeHandler, onEditSubmit, style }) => {

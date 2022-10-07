@@ -1,14 +1,13 @@
-import React, { useEffect, useState, Fragment } from 'react';
-import Icon from '../common/Icon';
-import BasicAddForm from './AddTaskForm';
+import React, { useState, Fragment } from 'react';
 import './Boards.scss';
-import TaskCard from './TaskCard';
-import { useBoardData } from '../context/BoardDataContext';
-import { removeAndAddToList, reorderList, toggleElementFromSet } from './helper';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Draggable } from 'react-beautiful-dnd';
+import Icon from '../common/Icon';
+import BasicAddForm from '../tasks/AddTaskForm';
+import TaskCard from '../tasks/TaskCard';
+import { useProjectData, useUI } from '../hooks';
+import { removeAndAddToList, reorderList } from '../lib';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Loader from '../common/Loader';
-
+import { toggleElementFromSet } from './helper';
 const Boards = () => {
 	const [activeBoardIndexes, setActiveBoardIndexes] = useState(new Set([]));
 	const [editingBoardIndexes, setEditingBoardIndexes] = useState(new Set([]));
@@ -19,8 +18,6 @@ const Boards = () => {
 	const [inputs, setInputs] = useState({});
 
 	const {
-		boardDataLoading,
-		boardData,
 		deleteBoardInfo,
 		editBoardName,
 		addNewBoard,
@@ -29,11 +26,10 @@ const Boards = () => {
 		deleteTask: deleteTaskContext,
 		editTask,
 		updateListOrder,
-		getProjectList,
 		projectDetails,
-		setProjectDetails,
-		show,
-	} = useBoardData();
+	} = useProjectData();
+
+	const { isLoading, showSidebar } = useUI();
 
 	const onAddIconClick = (index) => toggleElementFromSet(activeBoardIndexes, index, setActiveBoardIndexes);
 
@@ -149,12 +145,10 @@ const Boards = () => {
 		}
 	};
 
-	
-
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
-			<div className='boards-wrapper' style={{ marginLeft: show ? '275px' : '35px' }}>
-				{!boardDataLoading ? (
+			<div className='boards-wrapper' style={{ marginLeft: showSidebar ? '275px' : '35px' }}>
+				{!isLoading ? (
 					<Fragment>
 						{Object.entries(projectDetails?.boards ?? {}).map(([boardPos, column], index) => {
 							return (
