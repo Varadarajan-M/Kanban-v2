@@ -7,7 +7,7 @@ export const UIContext = createContext({
 
 const UIContextProvider = ({ children }) => {
 	const [loading, setLoading] = useState(false);
-	const [showSidebar, setShowSidebar] = useState(false);
+	const [showSidebar, setShowSidebar] = useState(true);
 
 	const startLoading = () => setLoading(true);
 	const stopLoading = () => setLoading(false);

@@ -4,7 +4,7 @@ import Icon from '../common/Icon';
 import BasicAddForm from '../tasks/AddTaskForm';
 import TaskCard from '../tasks/TaskCard';
 import { useProjectData, useUI } from '../hooks';
-import { removeAndAddToList, reorderList } from '../lib';
+import { isFalsy, removeAndAddToList, reorderList } from '../lib';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Loader from '../common/Loader';
 import { toggleElementFromSet } from './helper';
@@ -27,6 +27,7 @@ const Boards = () => {
 		editTask,
 		updateListOrder,
 		projectDetails,
+		activeProject,
 	} = useProjectData();
 
 	const { isLoading, showSidebar } = useUI();
@@ -114,7 +115,6 @@ const Boards = () => {
 	};
 
 	const onDragEnd = (e) => {
-		console.log('drag event result', e);
 		const source = e.source;
 		const destination = e.destination;
 		if (!destination) return;
@@ -144,6 +144,10 @@ const Boards = () => {
 			return;
 		}
 	};
+
+	if (isFalsy(activeProject)) {
+		return <h1 style={{ marginTop: '20%', marginLeft: '20%' }}>No data </h1>;
+	}
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>

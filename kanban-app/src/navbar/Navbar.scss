@@ -57,6 +57,13 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: flex-end;
+			align-items: center;
+			span {
+				font-size: 30px;
+			}
+			.text-light {
+				color: #ffffff9e !important;
+			}
 			button {
 				color: $navTextColor;
 				margin: 0.5rem;

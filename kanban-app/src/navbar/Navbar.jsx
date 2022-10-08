@@ -5,6 +5,7 @@ import Modals from '../project/ProjectModals';
 import { useAuth } from '../context/AuthContext';
 
 import './Navbar.scss';
+import Icon from '../common/Icon';
 
 const Navbar = () => {
 	const [addOpen, setAddOpen] = useState(false);
@@ -16,7 +17,7 @@ const Navbar = () => {
 		},
 		clearAuthState,
 	} = useAuth();
-	const { saveState, saveChanges, projectDetails } = useProjectData();
+	const { saveState, saveChanges, projectDetails, removeProject } = useProjectData();
 	const navigate = useNavigate();
 
 	const closeAddProjectModal = () => setAddOpen(false);
@@ -42,14 +43,20 @@ const Navbar = () => {
 					<button className='btn btn-success' onClick={openAddProjectModal}>
 						New
 					</button>
-					<button className='btn btn-success' onClick={openEditProjectModal}>
-						Edit
-					</button>
-					<div className='nav__save_btn'>
+					<Icon className='text-light' type={'edit_document'} tooltip='Edit Project' onClick={openEditProjectModal} />{' '}
+					<Icon className='text-light' type={'delete'} tooltip='Delete Project' onClick={removeProject} />
+					<Icon
+						className='text-light'
+						disabled={isSaveDisabled || isSaving}
+						type={'save'}
+						tooltip='Save Changes'
+						onClick={saveChanges}
+					/>
+					{/* <div className='nav__save_btn'>
 						<button disabled={isSaveDisabled || isSaving} onClick={saveChanges}>
 							{isSaving ? 'Saving' : 'Save'}
 						</button>
-					</div>
+					</div> */}
 					<button
 						onClick={() => {
 							clearAuthState();
@@ -72,11 +79,11 @@ const Navbar = () => {
 			<Modals.EditProjectModal
 				open={editOpen}
 				onBackdropClick={closeEditProjectModal}
-				title={`Edit ${projectDetails.name}`}
+				title={`Edit ${projectDetails?.name}`}
 				primaryButton={'Update'}
 				secondaryButton={'Discard'}
 				onSecondaryClick={closeEditProjectModal}
-				defaultValues={{ name: projectDetails.name }}
+				defaultValues={{ name: projectDetails?.name }}
 			/>
 		</div>
 	);

@@ -12,10 +12,12 @@ import {
 	createTask,
 	createProject,
 	updateProject,
+	deleteProject,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty, removeKey, setValue } from '../lib';
 import { useInstantUpdate, useAuth, useUI } from '../hooks';
+import { isNotFalsy } from './../lib/index';
 
 export const ProjectContext = createContext({});
 
@@ -25,16 +27,31 @@ const ProjectContextProvider = ({ children }) => {
 	const [saveState, setSaveState] = useState('disabled');
 	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
 
+	const isSaveDisabled = saveState === 'disabled';
+
+	const [activeProject, setActiveProject] = useState(null);
+
 	const navigate = useNavigate();
 	const { startLoading, stopLoading } = useUI();
 	const { clearAuthState } = useAuth();
 	const { performInstantUpdate } = useInstantUpdate(setProjectDetails);
 
+	const switchProject = (projectId) => {
+		if (!isSaveDisabled) {
+			if (window.confirm('Your changes are not saved. Do you want to save and switch project?')) {
+				saveChanges();
+				setActiveProject(projectId);
+			}
+			return;
+		}
+		setActiveProject(projectId);
+	};
+
 	const addProject = async (project) => {
-		if (!project.name) return;
 		const res = await createProject(project, getUserToken());
 		if (isResOk(res)) {
 			setProjectList((p) => [res.payload, ...p]);
+			isSaveDisabled && setActiveProject(res.payload._id);
 		}
 	};
 	const editProject = async (project) => {
@@ -42,7 +59,20 @@ const ProjectContextProvider = ({ children }) => {
 		const res = await updateProject(projectDetails._id, project, getUserToken());
 		if (isResOk(res)) {
 			setProjectList((proj) => proj.map((p) => (p._id === projectDetails._id ? { ...p, name: project?.name } : p)));
+			setProjectDetails((proj) => ({ ...proj, name: project?.name }));
 		}
+	};
+
+	const removeProject = async () => {
+		const deletedProjectIdx = projectList.map((p) => p._id).indexOf(projectDetails._id);
+
+		setProjectList((prevProjectList) => prevProjectList.filter((_, index) => index !== deletedProjectIdx));
+
+		let currentFocus = deletedProjectIdx === 0 ? deletedProjectIdx + 1 : deletedProjectIdx - 1;
+
+		projectList.length > 1 ? setActiveProject(projectList[currentFocus]._id) : setActiveProject(null);
+
+		const res = await deleteProject(projectDetails._id, getUserToken());
 	};
 
 	const getProjectInfo = async (projectId) => {
@@ -52,7 +82,7 @@ const ProjectContextProvider = ({ children }) => {
 			setProjectDetails(res.payload);
 			stopLoading();
 		} else {
-			console.log('Response not okay');
+			navigate('/');
 		}
 	};
 
@@ -60,7 +90,7 @@ const ProjectContextProvider = ({ children }) => {
 		const res = await getAllProjects(getUserToken());
 		if (isResOk(res)) {
 			if (!isArrayEmpty(res?.payload)) {
-				getProjectInfo(res?.payload[0]._id);
+				setActiveProject(res.payload[0]?._id);
 				setProjectList(res.payload);
 			}
 		} else {
@@ -196,6 +226,10 @@ const ProjectContextProvider = ({ children }) => {
 	};
 
 	useEffect(() => {
+		if (isNotFalsy(activeProject)) getProjectInfo(activeProject);
+	}, [activeProject]);
+
+	useEffect(() => {
 		const beforeUnloadListener = (event) => {
 			event.preventDefault();
 			return (event.returnValue = 'Are you sure you want to exit?');
@@ -237,6 +271,9 @@ const ProjectContextProvider = ({ children }) => {
 				projectList,
 				addProject,
 				editProject,
+				switchProject,
+				removeProject,
+				activeProject,
 			}}
 		>
 			{children}

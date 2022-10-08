@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useProjectData, useUI } from '../hooks';
+import { isArrayEmpty } from '../lib';
 import './ProjectSidebar.scss';
 
 const ProjectSidebar = () => {
-	const { getProjectList, projectList, getProjectInfo, projectDetails } = useProjectData();
+	const { getProjectList, projectList, projectDetails, switchProject } = useProjectData();
 	const { showSidebar, toggleSidebar } = useUI();
 	useEffect(() => {
-		getProjectList();
+		getProjectList?.();
 	}, []);
 
 	const [searchItem, setSearchItem] = useState('');
@@ -14,6 +15,8 @@ const ProjectSidebar = () => {
 		setSearchItem(event.target.value);
 	};
 	const clearFilter = () => setSearchItem('');
+
+	const filteredList = projectList?.filter((item) => item.name?.toLowerCase().includes(searchItem?.toLowerCase()));
 	return (
 		<aside className='project__sidebar' style={{ left: showSidebar ? 0 : '-215px' }}>
 			<div className='search'>
@@ -41,20 +44,22 @@ const ProjectSidebar = () => {
 				</span>
 			</div>
 			<div className='project__list'>
-				{projectList
-					?.filter((item) => item.name.toLowerCase().includes(searchItem.toLowerCase()))
-					?.map((filteredItem) => (
+				{!isArrayEmpty(filteredList) ? (
+					filteredList.map((filteredItem) => (
 						<p
 							style={{
 								cursor: 'pointer',
 								color: filteredItem._id === projectDetails._id ? 'red' : 'white',
 							}}
-							onClick={() => getProjectInfo(filteredItem._id)}
+							onClick={() => switchProject(filteredItem._id)}
 							key={filteredItem._id}
 						>
 							{filteredItem.name}
 						</p>
-					))}
+					))
+				) : (
+					<p> No data </p>
+				)}
 			</div>
 		</aside>
 	);
