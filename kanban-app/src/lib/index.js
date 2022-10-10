@@ -44,3 +44,9 @@ export const isStrNotFalsy = (v) => !isStrFalsy(v);
 export const isArrayEmpty = (arr = []) => arr.length === 0;
 
 export const hasKey = (obj = {}, key = '') => obj?.hasOwnProperty(key);
+
+export const getCharacters = (text, numberOfChars = 2) =>
+	text
+		.split(' ')
+		.slice(0, numberOfChars)
+		.reduce((acc, character) => acc + character.charAt(0).toUpperCase(), '');

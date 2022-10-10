@@ -1,3 +1,4 @@
+@import './variables';
 * {
 	box-sizing: border-box;
 	margin: 0;
@@ -61,7 +62,7 @@ button {
 	border: none;
 	padding-bottom: 5px;
 	margin-left: 10px;
-	border-bottom: 2px solid #2ea043;
+	border-bottom: 2px solid $lightgreen;
 	option {
 		padding: 0.5rem;
 		background-color: black;

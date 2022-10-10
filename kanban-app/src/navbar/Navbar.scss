@@ -1,3 +1,4 @@
+@import '../variables';
 $navTextColor: rgba(255, 255, 255, 0.75);
 
 .navbar__wrapper {
@@ -46,7 +47,6 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				border: none;
 				padding-bottom: 5px;
 				margin-left: 10px;
-				border-bottom: 2px solid #2ea043;
 				option {
 					padding: 0.5rem;
 					background-color: black;
@@ -55,7 +55,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 		}
 		.nav__buttons {
 			display: flex;
-			flex-wrap: wrap;
+			flex-wrap: nowrap;
 			justify-content: flex-end;
 			align-items: center;
 			span {
@@ -66,6 +66,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			}
 			button {
 				color: $navTextColor;
+				background: $lightgreen;
 				margin: 0.5rem;
 				height: 30px;
 				border-radius: 5px;

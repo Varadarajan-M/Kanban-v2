@@ -1,3 +1,4 @@
+@import '../variables';
 .project__sidebar {
 	background: black;
 	height: 100vh;
@@ -41,7 +42,7 @@
 		span {
 			margin: auto;
 			cursor: pointer;
-			color: #2ea043;
+			color: $lightgreen;
 		}
 	}
 }
