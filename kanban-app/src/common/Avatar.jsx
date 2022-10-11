@@ -1,9 +1,10 @@
 import React from 'react';
 import { getCharacters } from '../lib';
 
-const Avatar = React.forwardRef(({ text }, ref) => {
+const Avatar = React.forwardRef(({ text, onClick }, ref) => {
 	return (
 		<svg
+			onClick={onClick}
 			style={{ cursor: 'pointer' }}
 			ref={ref}
 			xmlns='http://www.w3.org/2000/svg'

@@ -84,6 +84,38 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				}
 			}
 		}
+		.custom-menu-container {
+			position: relative;
+			.custom-menu {
+				position: absolute;
+				top: 100%;
+				margin: 8px 0 0 -31px;
+
+				display: flex;
+				flex-direction: column;
+				align-content: center;
+				justify-content: center;
+				width: max-content;
+				box-shadow: 0 2px 5px 0 rgb(127 96 96 / 10%);
+				color: #ffffff;
+				padding: 5px 10px;
+				border-radius: 6px;
+				border: none;
+				background: #161b22;
+				cursor: pointer;
+				ul,
+				li {
+					margin: 0;
+					padding: 0;
+				}
+				ul li {
+					list-style: none;
+				}
+				span {
+					font-size: 16px !important;
+				}
+			}
+		}
 	}
 }
 
