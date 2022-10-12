@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjectData } from '../hooks';
+import { isArrayEmpty } from '../lib';
 import Modals from '../project/ProjectModals';
 import { useAuth } from '../context/AuthContext';
 import Icon from '../common/Icon';
@@ -12,9 +13,7 @@ const Navbar = () => {
 	const [addOpen, setAddOpen] = useState(false);
 	const [editOpen, setEditOpen] = useState(false);
 	const [avatarClicked, setAvatarClicked] = useState(false);
-
-	const openAvatarMenu = () => setAvatarClicked(true);
-	const closeAvatarMenu = () => setAvatarClicked(false);
+	const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
 
 	const {
 		authState: {
@@ -22,7 +21,7 @@ const Navbar = () => {
 		},
 		clearAuthState,
 	} = useAuth();
-	const { saveState, saveChanges, projectDetails, removeProject } = useProjectData();
+	const { saveState, saveChanges, projectDetails, projectList, removeProject } = useProjectData();
 	const navigate = useNavigate();
 
 	const closeAddProjectModal = () => setAddOpen(false);
@@ -31,8 +30,25 @@ const Navbar = () => {
 	const closeEditProjectModal = () => setEditOpen(false);
 	const openEditProjectModal = () => setEditOpen(true);
 
+	const openAvatarMenu = () => setAvatarClicked(true);
+	const closeAvatarMenu = () => setAvatarClicked(false);
+
+	const openMoreOptions = () => setMoreOptionsOpen(true);
+	const closeMoreOptions = () => setMoreOptionsOpen(false);
+
 	const isSaveDisabled = saveState === 'disabled';
 	const isSaving = saveState === 'saving';
+
+	const deleteProject = () => {
+		if (window.confirm('Are you sure you want to delete this project')) {
+			removeProject();
+			closeMoreOptions();
+		}
+		return;
+	};
+
+	const haveNoProjects = useMemo(() => isArrayEmpty(projectList), [projectList]);
+
 	return (
 		<div className='navbar__wrapper'>
 			<div className='title'>
@@ -48,21 +64,54 @@ const Navbar = () => {
 					<button className='btn btn-success' onClick={openAddProjectModal}>
 						New
 					</button>
-					<Icon className='text-light' type={'edit_document'} tooltip='Edit Project' onClick={openEditProjectModal} />{' '}
-					<Icon className='text-light' type={'delete'} tooltip='Delete Project' onClick={removeProject} />
-					<div className='nav__save_btn d-flex'>
-						<Icon
-							className='text-light'
-							disabled={isSaveDisabled || isSaving}
-							type={'save'}
-							tooltip='Save Changes'
-							onClick={saveChanges}
-						/>
-					</div>
-					<MenuContainer>
+					{!haveNoProjects ? (
+						<>
+							<Icon
+								className='text-light edit'
+								type={'edit_document'}
+								tooltip='Edit Project'
+								onClick={openEditProjectModal}
+							/>{' '}
+							<Icon
+								className='text-light delete'
+								type={'delete'}
+								tooltip='Delete Project'
+								onClick={deleteProject}
+							/>
+							{/* More options Menu only to be visible on smaller screens */}
+							<MenuContainer className='more-options-menu'>
+								<Icon
+									className='text-light more-options'
+									type={'more_vert'}
+									tooltip='More Options'
+									onClick={openMoreOptions}
+								/>
+								{moreOptionsOpen ? (
+									<Menu style={{ margin: '16px 0 0 -45px' }} onBlur={() => setTimeout(closeMoreOptions, 100)}>
+										<MenuItem onClick={openEditProjectModal}>Edit Project</MenuItem>
+										<MenuItem onClick={deleteProject}>Delete Project</MenuItem>
+									</Menu>
+								) : (
+									''
+								)}
+							</MenuContainer>
+							<div className='nav__save_btn d-flex'>
+								<Icon
+									className='text-light'
+									disabled={isSaveDisabled || isSaving}
+									type={'save'}
+									tooltip='Save Changes'
+									onClick={saveChanges}
+								/>
+							</div>
+						</>
+					) : (
+						''
+					)}
+					<MenuContainer className={haveNoProjects ? 'ml-2' : ''}>
 						<Avatar onClick={openAvatarMenu} text={username} />
 						{avatarClicked ? (
-							<Menu onBlur={closeAvatarMenu}>
+							<Menu style={{ margin: '6px 0 0 -25px' }} onBlur={() => setTimeout(closeAvatarMenu, 100)}>
 								<MenuItem
 									onClick={() => {
 										clearAuthState();

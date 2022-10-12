@@ -46,3 +46,9 @@
 		}
 	}
 }
+
+@media screen and (max-width: 500px) {
+	.project__sidebar {
+		top: 61px;
+	}
+}

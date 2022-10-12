@@ -2,6 +2,9 @@
 $navTextColor: rgba(255, 255, 255, 0.75);
 
 .navbar__wrapper {
+	* {
+		transition: 0.2s ease-in;
+	}
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -61,6 +64,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			span {
 				font-size: 30px;
 			}
+
 			.text-light {
 				color: #ffffff9e !important;
 			}
@@ -98,15 +102,16 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				width: max-content;
 				box-shadow: 0 2px 5px 0 rgb(127 96 96 / 10%);
 				color: #ffffff;
-				padding: 5px 10px;
+				padding: 0 10px;
 				border-radius: 6px;
 				border: none;
 				background: #161b22;
 				cursor: pointer;
 				ul,
 				li {
-					margin: 0;
+					margin: 10px 0;
 					padding: 0;
+					font-size: 14px;
 				}
 				ul li {
 					list-style: none;
@@ -132,26 +137,48 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				content: ' changes';
 			}
 		}
+		.more-options-menu {
+			display: none;
+		}
 	}
 }
 
 @media screen and (max-width: 500px) {
-	.nav__buttons {
-		.nav__save_btn {
-			position: fixed;
-			display: flex;
-			align-items: center;
-			justify-content: flex-end;
-			bottom: 0;
-			right: 0;
-			height: 10%;
-			width: 100%;
-			z-index: 1;
-			background-color: black;
+	.navbar__wrapper {
+		.title {
+			display: none;
+		}
+		.navbar {
+			background: black;
+		}
+		.nav__buttons {
 			button {
-				background-color: #202429;
-				width: 60px;
-				margin-right: 20px;
+				margin: 0.5rem 0.2rem 0.5rem 1rem !important;
+			}
+			.nav__save_btn {
+				position: fixed;
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				bottom: 0;
+				right: 0;
+				height: 55px;
+				width: 100%;
+				z-index: 1;
+				background-color: black;
+				button {
+					background-color: #202429;
+					width: 60px;
+					margin-right: 20px;
+				}
+			}
+			.edit,
+			.delete {
+				display: none !important;
+			}
+
+			.more-options-menu {
+				display: flex;
 			}
 		}
 	}
