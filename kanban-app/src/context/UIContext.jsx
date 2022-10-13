@@ -15,6 +15,7 @@ const UIContextProvider = ({ children }) => {
 
 	const toggleSidebar = () => setShowSidebar(!showSidebar);
 	const closeSidebar = () => setShowSidebar(false);
+	const openSidebar = () => setShowSidebar(true);
 
 	return (
 		<UIContext.Provider
@@ -25,6 +26,7 @@ const UIContextProvider = ({ children }) => {
 				showSidebar,
 				toggleSidebar,
 				closeSidebar,
+				openSidebar,
 			}}
 		>
 			{children}

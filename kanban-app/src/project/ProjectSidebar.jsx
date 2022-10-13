@@ -5,7 +5,7 @@ import './ProjectSidebar.scss';
 
 const ProjectSidebar = () => {
 	const { getProjectList, projectList, projectDetails, switchProject } = useProjectData();
-	const { showSidebar, toggleSidebar, closeSidebar } = useUI();
+	const { showSidebar, toggleSidebar, closeSidebar, openSidebar } = useUI();
 	useEffect(() => {
 		getProjectList?.();
 	}, []);
@@ -21,7 +21,7 @@ const ProjectSidebar = () => {
 	const haveNoProjects = useMemo(() => isArrayEmpty(projectList), [projectList]);
 
 	useEffect(() => {
-		haveNoProjects && closeSidebar();
+		!haveNoProjects && openSidebar();
 	}, [haveNoProjects]);
 
 	return (
@@ -43,7 +43,7 @@ const ProjectSidebar = () => {
 				<span
 					title={showSidebar ? 'Hide' : 'Show'}
 					role='button'
-					onClick={!haveNoProjects && toggleSidebar}
+					onClick={!haveNoProjects ? toggleSidebar : closeSidebar}
 					className='material-symbols-outlined expand__collapse'
 					style={{ marginLeft: !showSidebar ? '-9px' : 'auto' }}
 				>
