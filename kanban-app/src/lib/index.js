@@ -50,3 +50,5 @@ export const getCharacters = (text, numberOfChars = 2) =>
 		.split(' ')
 		.slice(0, numberOfChars)
 		.reduce((acc, character) => acc + character.charAt(0).toUpperCase(), '');
+
+export const withDelay = (fn) => setTimeout(() => fn(), 50);

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProjectData } from '../hooks';
 import { isArrayEmpty } from '../lib';
@@ -33,8 +33,8 @@ const Navbar = () => {
 	const openAvatarMenu = () => setAvatarClicked(true);
 	const closeAvatarMenu = () => setAvatarClicked(false);
 
-	const openMoreOptions = () => setMoreOptionsOpen(true);
-	const closeMoreOptions = () => setMoreOptionsOpen(false);
+	const openMoreOptions = useCallback(() => setMoreOptionsOpen(true), []);
+	const closeMoreOptions = useCallback(() => setMoreOptionsOpen(false), []);
 
 	const isSaveDisabled = saveState === 'disabled';
 	const isSaving = saveState === 'saving';
@@ -87,7 +87,7 @@ const Navbar = () => {
 									onClick={openMoreOptions}
 								/>
 								{moreOptionsOpen ? (
-									<Menu style={{ margin: '16px 0 0 -45px' }} onBlur={() => setTimeout(closeMoreOptions, 100)}>
+									<Menu style={{ margin: '16px 0 0 -45px' }} onBlur={() => setTimeout(closeMoreOptions, 200)}>
 										<MenuItem onClick={openEditProjectModal}>Edit Project</MenuItem>
 										<MenuItem onClick={deleteProject}>Delete Project</MenuItem>
 									</Menu>
@@ -97,12 +97,15 @@ const Navbar = () => {
 							</MenuContainer>
 							<div className='nav__save_btn d-flex'>
 								<Icon
-									className='text-light'
+									className='text-light save-icon'
 									disabled={isSaveDisabled || isSaving}
 									type={'save'}
 									tooltip='Save Changes'
 									onClick={saveChanges}
 								/>
+								<button disabled={isSaveDisabled || isSaving} className='save-btn' onClick={saveChanges}>
+									Save
+								</button>
 							</div>
 						</>
 					) : (

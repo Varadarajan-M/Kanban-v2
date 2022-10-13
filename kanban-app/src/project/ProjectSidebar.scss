@@ -25,13 +25,18 @@
 
 		.has-icon-right {
 			input {
-				height: 30px;
-				padding: 3px;
+				height: 35px;
+				padding: 10px;
+				padding-right: 20px;
 				border: 1.5px solid #30363d;
 				border-radius: 5px;
 				background: inherit;
 				color: #c9d1d9;
+				&:focus {
+					border: 1.5px solid $lightgreen;
+				}
 			}
+
 			span {
 				position: absolute;
 				right: 0.8rem;
@@ -50,5 +55,13 @@
 @media screen and (max-width: 500px) {
 	.project__sidebar {
 		top: 61px;
+	}
+}
+
+@media screen and (max-height: 500px) {
+	.project__sidebar {
+		.project__list {
+			padding-bottom: 30%;
+		}
 	}
 }

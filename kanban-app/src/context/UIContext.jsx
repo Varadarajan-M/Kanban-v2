@@ -14,6 +14,7 @@ const UIContextProvider = ({ children }) => {
 	const isLoading = loading;
 
 	const toggleSidebar = () => setShowSidebar(!showSidebar);
+	const closeSidebar = () => setShowSidebar(false);
 
 	return (
 		<UIContext.Provider
@@ -23,6 +24,7 @@ const UIContextProvider = ({ children }) => {
 				stopLoading,
 				showSidebar,
 				toggleSidebar,
+				closeSidebar,
 			}}
 		>
 			{children}

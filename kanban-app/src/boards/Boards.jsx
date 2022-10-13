@@ -146,7 +146,28 @@ const Boards = () => {
 	};
 
 	if (isFalsy(activeProject)) {
-		return <h1 style={{ marginTop: '20%', marginLeft: '20%' }}>No data </h1>;
+		return (
+			<div
+				style={{
+					height: '100%',
+					width: '100%',
+					display: 'grid',
+					placeItems: 'center',
+					letterSpacing: '1px',
+				}}
+			>
+				<h4
+					style={{
+						fontWeight: 300,
+					}}
+				>
+					No Projects Available!
+					<p className='mt-1'>
+						Click <strong> New </strong> to add one.
+					</p>
+				</h4>
+			</div>
+		);
 	}
 
 	return (
