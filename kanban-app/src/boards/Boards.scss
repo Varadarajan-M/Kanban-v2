@@ -3,7 +3,7 @@
 	display: flex;
 	gap: 15px;
 	overflow-x: scroll;
-	margin: 150px 20px 40px 200px;
+	margin: 150px 2px 40px 200px;
 	transition: margin-left 0.2s ease-in;
 	padding-bottom: 5rem;
 
@@ -13,9 +13,10 @@
 		height: max(350px, 100%);
 		min-width: 330px;
 		max-width: 360px;
-		background-color: #010409;
+		background: #050a15;
 		border-radius: 5px;
-		border: 1.5px solid #30363d;
+		border: 1.5px solid #8ac9ff45;
+
 		&:focus {
 			border: 2px solid #58a6ff;
 			box-shadow: 3px 4px 4px 3px rgb(32 19 113 / 34%);
@@ -26,13 +27,15 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			border-bottom: 1.5px solid #30363d;
+			border-bottom: 1.5px solid #2e5f96a1;
 
 			.board__left {
 				display: flex;
 				gap: 7px;
 				align-items: center;
 				word-break: break-all;
+				font-weight: 700;
+				letter-spacing: 0.25px;
 
 				.board__items-length {
 					display: flex;
@@ -81,7 +84,7 @@
 	}
 	.board.add__new {
 		background-color: transparent;
-		border: 3.5px dotted #30363d;
+		border: 3.5px dotted #1a3846;
 		border-radius: 0;
 		display: flex;
 		align-items: center;

@@ -54,10 +54,7 @@ const ProjectSidebar = () => {
 				{!isArrayEmpty(filteredList) ? (
 					filteredList.map((filteredItem) => (
 						<p
-							style={{
-								cursor: 'pointer',
-								color: filteredItem._id === projectDetails._id ? 'red' : 'white',
-							}}
+							className={filteredItem._id === projectDetails._id ? 'active' : 'inactive'}
 							onClick={() => switchProject(filteredItem._id)}
 							key={filteredItem._id}
 						>

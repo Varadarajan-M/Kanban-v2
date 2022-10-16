@@ -1,9 +1,9 @@
 @import '../variables';
 .project__sidebar {
-	background: black;
+	background: linear-gradient(48deg, #0b1328, black);
 	height: 100vh;
 	position: fixed;
-	top: 113px;
+	top: 61px;
 	color: white;
 	width: 250px;
 	display: flex;
@@ -15,6 +15,33 @@
 	.project__list {
 		max-height: 70%;
 		overflow: auto;
+		p {
+			cursor: pointer;
+		}
+		p.active {
+			color: hotpink;
+			border-bottom: 1px solid #ff69b4b0;
+		}
+		p.inactive {
+			transition: all 0.7s ease-in;
+			&:hover {
+				transform: scale(1.01);
+				color: #ff0683 !important;
+			}
+			&::after {
+				background: #ff0683;
+				border-radius: 20px;
+				content: '';
+				display: block;
+				height: 1.5px;
+				transition: all 0.2s ease-in;
+				text-shadow: #c9d1d9;
+				width: 0;
+			}
+			&:hover::after {
+				width: 100%;
+			}
+		}
 	}
 
 	.search {

@@ -51,18 +51,17 @@ const Navbar = () => {
 
 	return (
 		<div className='navbar__wrapper'>
-			<div className='title'>
-				<span>{username ?? 'User'} / Kanban App</span>
-			</div>
 			<nav className='navbar'>
 				<select className='custom-select'>
 					<option value='My Projects'>My Projects</option>
 					<option value='Shared Projects'>Shared Projects</option>
 				</select>
 
+				<span className='username hide-md'>{username ?? 'User'} / Kanban App</span>
+
 				<div className='nav__buttons'>
-					<button className='btn btn-success' onClick={openAddProjectModal}>
-						New
+					<button className='btn new-project' onClick={openAddProjectModal}>
+						New <span className='p hide-md'>Project</span>
 					</button>
 					{!haveNoProjects ? (
 						<>

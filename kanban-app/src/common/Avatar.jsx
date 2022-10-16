@@ -1,11 +1,12 @@
-import React from 'react';
-import { getCharacters } from '../lib';
+import React, { useState } from 'react';
+import { getCharacters, getRandomColor } from '../lib';
 
 const Avatar = React.forwardRef(({ text, onClick }, ref) => {
+	const [avatarFill] = useState(getRandomColor);
 	return (
 		<svg
 			onClick={onClick}
-			style={{ cursor: 'pointer' }}
+			style={{ cursor: 'pointer', transition: 'none' }}
 			ref={ref}
 			xmlns='http://www.w3.org/2000/svg'
 			width='40px'
@@ -13,15 +14,13 @@ const Avatar = React.forwardRef(({ text, onClick }, ref) => {
 			viewBox='0 0 64 64'
 			version='1.1'
 		>
-			<circle fill='#202124' width='40' height='40' cx='32' cy='32' r='32' />
+			<circle fill={avatarFill} width='40' height='40' cx='32' cy='32' r='32' />
 			<text
 				x='50%'
 				y='50%'
 				style={{
 					color: '#ffffff',
 					lineHeight: 1,
-					fontFamily:
-						"-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
 				}}
 				alignmentBaseline='middle'
 				textAnchor='middle'

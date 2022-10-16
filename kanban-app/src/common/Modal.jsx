@@ -14,11 +14,11 @@ const Modal = ({ open, onBackdropClick, title, children, onPrimaryClick, onSecon
 					<div className='content'>{children}</div>
 				</div>
 				<div className='modal-footer d-flex mt-2' style={{ justifyContent: 'flex-end', gap: '10px' }}>
-					<button className='btn btn-success' onClick={onPrimaryClick}>
+					<button style={{ background: '#0c8cab', color: 'white' }} className='btn primary' onClick={onPrimaryClick}>
 						{primaryButton}
 					</button>
 					<button
-						className='btn text-light'
+						className='btn secondary'
 						style={{ background: '#161b22', border: 'none' }}
 						onClick={onSecondaryClick}
 					>

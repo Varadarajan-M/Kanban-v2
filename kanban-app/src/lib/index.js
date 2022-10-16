@@ -52,3 +52,20 @@ export const getCharacters = (text, numberOfChars = 2) =>
 		.reduce((acc, character) => acc + character.charAt(0).toUpperCase(), '');
 
 export const withDelay = (fn) => setTimeout(() => fn(), 50);
+
+const colors = [
+	'red',
+	'#0c8cab',
+	'blue',
+	'violet',
+	'indigo',
+	'orange',
+	'purple',
+	'maroon',
+	'magenta',
+	'indianred',
+	'pink',
+	'deeppink',
+];
+
+export const getRandomColor = () => colors[Math.floor(Math.random() * colors.length)];
