@@ -2,7 +2,7 @@ const BoardService = require('../services/board.service');
 const { sendSuccessPayload, throwError, sendError } = require('../helper');
 
 exports.create = async (req, res) => {
-	const newBoard = await BoardService.create(req?.params?.projectId, req.body, req?.user?.userID);
+  const newBoard = await BoardService.create(req?.params?.projectId, req.body, req?.user?.userID);
 	if (newBoard.ok) {
 		sendSuccessPayload(res, newBoard.board, 200);
 	} else {
