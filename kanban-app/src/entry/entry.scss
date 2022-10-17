@@ -54,13 +54,10 @@
 			button {
 				margin: 15px 0;
 				background-color: #21557c;
-				font-weight: 600;
-				font-size: 1rem;
-				color: #b1eeff;
-				cursor: pointer;
+				@include btnStyles;
 
 				&:hover {
-					background: #282d3a;
+					@include primaryHover;
 				}
 			}
 		}
