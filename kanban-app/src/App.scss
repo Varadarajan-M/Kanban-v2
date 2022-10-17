@@ -1,11 +1,13 @@
 @import './variables';
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 * {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
-	font-family: monospace;
+	font-family: 'Source Code Pro', monospace;
 }
+
 html {
 	background: #0e0c18;
 	height: 100vh;
@@ -13,6 +15,7 @@ html {
 	color: #c9d1d9;
 	font-size: unset !important;
 }
+
 body {
 	background: inherit;
 	color: unset;
@@ -23,9 +26,11 @@ button {
 	font-family: unset;
 	font-size: unset;
 }
+
 ::-webkit-scrollbar {
 	display: none;
 }
+
 .footer {
 	position: absolute;
 	bottom: -20px;
@@ -63,6 +68,7 @@ button {
 	padding-bottom: 5px;
 	margin-left: 10px;
 	border-bottom: 2px solid rgba($primaryBtn, 0.7);
+
 	option {
 		padding: 0.5rem;
 		background-color: black;
@@ -87,12 +93,14 @@ button {
 	border-right-color: transparent;
 	border-top-color: transparent;
 }
+
 .lds-ellipsis {
 	display: inline-block;
 	position: absolute;
 	width: 80px;
 	height: 80px;
 }
+
 .lds-ellipsis div {
 	position: absolute;
 	top: 33px;
@@ -102,42 +110,52 @@ button {
 	background: #fff;
 	animation-timing-function: cubic-bezier(0, 1, 1, 0);
 }
+
 .lds-ellipsis div:nth-child(1) {
 	left: 8px;
 	animation: lds-ellipsis1 0.6s infinite;
 }
+
 .lds-ellipsis div:nth-child(2) {
 	left: 8px;
 	animation: lds-ellipsis2 0.6s infinite;
 }
+
 .lds-ellipsis div:nth-child(3) {
 	left: 32px;
 	animation: lds-ellipsis2 0.6s infinite;
 }
+
 .lds-ellipsis div:nth-child(4) {
 	left: 56px;
 	animation: lds-ellipsis3 0.6s infinite;
 }
+
 @keyframes lds-ellipsis1 {
 	0% {
 		transform: scale(0);
 	}
+
 	100% {
 		transform: scale(1);
 	}
 }
+
 @keyframes lds-ellipsis3 {
 	0% {
 		transform: scale(1);
 	}
+
 	100% {
 		transform: scale(0);
 	}
 }
+
 @keyframes lds-ellipsis2 {
 	0% {
 		transform: translate(0, 0);
 	}
+
 	100% {
 		transform: translate(24px, 0);
 	}
@@ -165,6 +183,7 @@ button {
 			background: #0c8cab;
 			color: $navTextColor;
 		}
+
 		&.secondary {
 			background: #2f3131;
 			color: $navTextColor;
@@ -175,10 +194,39 @@ button {
 input,
 textarea,
 .form-input {
+	font-size: 14px !important;
 	border: 1.5px solid #0a2d56f2 !important;
-	border-radius: 5px;
+	border-radius: 5px !important;
+
 	&:focus-visible {
 		border: 2px solid #58a6ff !important;
 		box-shadow: 3px 4px 4px 3px rgb(32 19 113 / 34%) !important;
+	}
+}
+
+
+.primaryBtn,
+.secondaryBtn {
+	@include btnStyles
+}
+
+
+.primaryBtn {
+	background: $primaryBtn;
+	transition: background 0.2s ease-in !important;
+
+	&:hover {
+		@include primaryHover;
+	}
+}
+
+.secondaryBtn {
+
+	background: rgba($secondaryBtn, 0.6);
+	transition: background 0.2s ease-in !important;
+
+
+	&:hover {
+		@include secondaryHover;
 	}
 }

@@ -1,4 +1,5 @@
 @import '../variables';
+
 .project__sidebar {
 	background: linear-gradient(48deg, #0b1328, black);
 	height: 100vh;
@@ -9,25 +10,30 @@
 	display: flex;
 	flex-direction: column;
 	transition: left 0.2s ease-in;
-	padding: 1.5rem;
+	padding: 18px;
 	gap: 30px;
 
 	.project__list {
 		max-height: 70%;
 		overflow: auto;
+
 		p {
 			cursor: pointer;
 		}
+
 		p.active {
 			color: hotpink;
-			border-bottom: 1px solid #ff69b4b0;
+			border-bottom: 1.5px solid #ff0683;
 		}
+
 		p.inactive {
 			transition: all 0.7s ease-in;
+
 			&:hover {
 				transform: scale(1.01);
 				color: #ff0683 !important;
 			}
+
 			&::after {
 				background: #ff0683;
 				border-radius: 20px;
@@ -38,6 +44,7 @@
 				text-shadow: #c9d1d9;
 				width: 0;
 			}
+
 			&:hover::after {
 				width: 100%;
 			}
@@ -47,7 +54,7 @@
 	.search {
 		display: grid;
 		grid-template-columns: 90% 10%;
-		gap: 23px;
+		gap: 17px;
 		width: 100%;
 
 		.has-icon-right {
@@ -59,15 +66,54 @@
 				border-radius: 5px;
 				background: inherit;
 				color: #c9d1d9;
+
 				&:focus {
 					border: 1.5px solid $lightgreen;
 				}
+
+
+
 			}
+
+			.form-icon {
+				height: 21px;
+				margin: 0.1rem 0.25rem;
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 21px;
+				z-index: 2;
+			}
+
+			.icon-close {
+				cursor: pointer;
+
+
+				&::before {
+					background: #005c4b;
+					height: 0.1rem;
+					width: 100%;
+				}
+
+				&::after {
+					background: #005c4b;
+					height: 100%;
+					width: 0.1rem;
+				}
+
+				&::before,
+				&::after {
+					transform: translate(-50%, -50%) rotate(45deg);
+				}
+			}
+
 
 			span {
 				position: absolute;
 				right: 0.8rem;
 				top: 0.6rem;
+
+
 			}
 		}
 

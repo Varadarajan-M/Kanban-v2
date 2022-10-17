@@ -5,11 +5,13 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 	* {
 		transition: 0.2s ease-in;
 	}
+
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	z-index: 1;
+
 	.navbar {
 		background: linear-gradient(348deg, #131121, black);
 		padding: 0.5rem;
@@ -18,6 +20,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 		align-items: center;
 		flex-wrap: nowrap;
 		height: max(62px, 62px);
+
 		button:disabled {
 			opacity: 0.4;
 			pointer-events: none;
@@ -40,17 +43,20 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				border: none;
 				padding-bottom: 5px;
 				margin-left: 10px;
+
 				option {
 					padding: 0.5rem;
 					background-color: black;
 				}
 			}
 		}
+
 		.nav__buttons {
 			display: flex;
 			flex-wrap: nowrap;
 			justify-content: flex-end;
 			align-items: center;
+
 			span {
 				font-size: 30px;
 			}
@@ -58,11 +64,17 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			.text-light {
 				color: rgb(237 254 255 / 70%) !important;
 			}
+
 			.new-project {
 				span {
 					font-size: inherit;
 				}
+
+				&:hover {
+					@include primaryHover
+				}
 			}
+
 			button {
 				color: $navTextColor;
 				background: #0c8cab;
@@ -80,8 +92,10 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				}
 			}
 		}
+
 		.custom-menu-container {
 			position: relative;
+
 			.custom-menu {
 				position: absolute;
 				top: 100%;
@@ -103,6 +117,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				opacity: 0;
 				transform: scale(0);
 				transition: all 0.2s ease-in-out;
+
 				&.active {
 					opacity: 1;
 					transform: scale(1);
@@ -114,9 +129,11 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 					padding: 0;
 					font-size: 14px;
 				}
+
 				ul li {
 					list-style: none;
 				}
+
 				span {
 					font-size: 16px !important;
 				}
@@ -130,12 +147,15 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 		button {
 			margin: 0.5rem;
 		}
+
 		.nav__save_btn {
 			display: flex;
+
 			button {
 				display: none;
 			}
 		}
+
 		.more-options-menu {
 			display: none;
 		}
@@ -148,6 +168,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			button {
 				margin: 0.5rem 0.2rem 0.5rem 1rem;
 			}
+
 			.nav__save_btn {
 				position: fixed;
 				display: flex;
@@ -159,9 +180,11 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				width: 100%;
 				z-index: 1;
 				background: linear-gradient(348deg, #131121, black);
+
 				.save-icon {
 					display: none;
 				}
+
 				button {
 					display: block;
 					background-color: #202429 !important;
@@ -169,6 +192,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 					margin-right: 20px;
 				}
 			}
+
 			.edit,
 			.delete {
 				display: none !important;
