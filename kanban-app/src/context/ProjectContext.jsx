@@ -26,6 +26,7 @@ const ProjectContextProvider = ({ children }) => {
 	const [projectDetails, setProjectDetails] = useState({});
 	const [saveState, setSaveState] = useState('disabled');
 	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
+	const [modifiedBoards, setModifiedBoards] = useState(new Set([]));
 
 	const isSaveDisabled = saveState === 'disabled';
 
@@ -35,6 +36,26 @@ const ProjectContextProvider = ({ children }) => {
 	const { startLoading, stopLoading } = useUI();
 	const { clearAuthState } = useAuth();
 	const { performInstantUpdate } = useInstantUpdate(setProjectDetails);
+
+	const addToModifiedBoards = (boardPosition) => {
+		setModifiedBoards((prev) => {
+			const prevList = new Set(prev);
+			prevList?.add(boardPosition);
+			return prevList;
+		});
+	};
+
+	const removeFromModifiedBoards = (boardPosition) => {
+		setModifiedBoards((prev) => {
+			const prevList = new Set(prev);
+			prevList?.delete(boardPosition);
+			return prevList;
+		});
+	};
+
+	const clearModifiedBoards = () => {
+		setModifiedBoards((_) => new Set([]));
+	};
 
 	const switchProject = (projectId) => {
 		if (!isSaveDisabled) {
@@ -147,8 +168,10 @@ const ProjectContextProvider = ({ children }) => {
 		const payload = { tasks: [], deletedStack };
 		setSaveState('saving');
 		Object.entries(projectDetails.boards).forEach(([key, board]) => {
-			const tasks = board.tasks.reduce((ac, task, index) => [...ac, { ...task, position: index }], []);
-			payload.tasks.push(tasks);
+			if (modifiedBoards.has(key)) {
+				const tasks = board.tasks.reduce((ac, task, index) => [...ac, { ...task, position: index }], []);
+				payload.tasks.push(tasks);
+			}
 		});
 		payload.tasks = payload.tasks.flat();
 
@@ -156,6 +179,7 @@ const ProjectContextProvider = ({ children }) => {
 		const res = await saveProject(projectId, payload, getUserToken());
 
 		if (isResOk(res)) setSaveState('disabled');
+		clearModifiedBoards();
 	};
 
 	// task methods
@@ -274,6 +298,8 @@ const ProjectContextProvider = ({ children }) => {
 				switchProject,
 				removeProject,
 				activeProject,
+				addToModifiedBoards,
+				removeFromModifiedBoards,
 			}}
 		>
 			{children}

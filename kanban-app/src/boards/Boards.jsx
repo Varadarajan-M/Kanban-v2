@@ -28,6 +28,8 @@ const Boards = () => {
 		updateListOrder,
 		projectDetails,
 		activeProject,
+		addToModifiedBoards,
+		removeFromModifiedBoards,
 	} = useProjectData();
 
 	const { isLoading, showSidebar } = useUI();
@@ -52,6 +54,7 @@ const Boards = () => {
 				})),
 			],
 		}));
+		removeFromModifiedBoards(boardPosition);
 		deleteBoardInfo(boardPosition);
 	};
 
@@ -96,6 +99,7 @@ const Boards = () => {
 			...stack,
 			tasks: [...stack.tasks, { _id: task._id }],
 		}));
+		addToModifiedBoards(boardPosition);
 		deleteTaskContext(task, boardPosition);
 	};
 
@@ -110,6 +114,7 @@ const Boards = () => {
 
 	const taskEditSubmitHandler = (boardPos, task_id) => {
 		editTask(boardPos, task_id, taskEditTracker[task_id]);
+		addToModifiedBoards(boardPos);
 		onTaskEditIconClick(task_id);
 		taskEditChangeHandler({ target: { value: '' } }, task_id);
 	};
@@ -123,7 +128,7 @@ const Boards = () => {
 			const destinationBoardPosition = destination.droppableId;
 			const tasks = [...projectDetails.boards[destinationBoardPosition].tasks];
 			const reorderedTasks = reorderList([...tasks], destination.index, tasks[source.index]);
-
+			addToModifiedBoards(destinationBoardPosition);
 			updateListOrder(destinationBoardPosition, reorderedTasks);
 		} else if (source.droppableId !== destination.droppableId) {
 			const sourceIndex = source.index;
@@ -138,6 +143,10 @@ const Boards = () => {
 			sourceList[sourceIndex].boardId = projectDetails.boards[destinationBoardPosition]._id;
 
 			const modifiedList = removeAndAddToList(sourceList, destinationList, destinationIndex, sourceList[sourceIndex]);
+
+			addToModifiedBoards(sourceBoardPosition);
+			addToModifiedBoards(destinationBoardPosition);
+
 			updateListOrder(sourceBoardPosition, modifiedList.sourceList);
 			updateListOrder(destinationBoardPosition, modifiedList.destList);
 		} else {
