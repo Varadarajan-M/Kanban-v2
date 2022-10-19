@@ -16,7 +16,7 @@ const getInitialAuthState = () => ({
 	},
 });
 
-const AuthContext = createContext(initAuthState);
+export const AuthContext = createContext(initAuthState);
 
 const AuthContextProvider = ({ children }) => {
 	const [authState, setAuthState] = useState(getInitialAuthState);

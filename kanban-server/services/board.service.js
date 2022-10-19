@@ -30,9 +30,12 @@ exports.create = async function (projectId, { name }, userId) {
 	}
 };
 
-exports.update = async function (id, { name }, userId) {
+exports.update = async function (projectId, boardId, { name }, userId) {
+	const projectOwner = await ProjectService.isProjectOwnerService(projectId, userId);
+	if (!projectOwner) return ERROR_RESPONSE;
+
 	try {
-		const updatedData = await Board.updateOne({ _id: id, userId }, { name, userId });
+		const updatedData = await Board.updateOne({ _id: boardId, userId, projectId }, { name, userId });
 		if (updatedData.modifiedCount > 0) {
 			return { ok: true, message: 'Updated successfully' };
 		}

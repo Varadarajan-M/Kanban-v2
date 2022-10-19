@@ -1,0 +1,28 @@
+$lightgreen: #005c4b;
+$darkgreen: #202124;
+$navTextColor: rgba(255, 255, 255, 0.75);
+$primaryBtn: #0c8cab;
+$secondaryBtn: #2f3131;
+
+@mixin primaryHover {
+	background: #647dbe;
+	filter: brightness(1.1);
+}
+
+@mixin secondaryHover {
+	filter: brightness(1.2);
+	background: #343448;
+}
+
+
+@mixin btnStyles {
+	outline: none;
+	border: none;
+	height: 35px;
+	border-radius: 5px;
+	margin: 15px 0;
+	font-weight: 600;
+	font-size: 1rem;
+	color: #b1eeff;
+	cursor: pointer;
+}

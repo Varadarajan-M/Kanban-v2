@@ -1,3 +1,5 @@
+@import '../variables';
+
 .container {
 	position: relative;
 	height: 100%;
@@ -11,8 +13,6 @@
 		margin: 20px 0;
 		line-height: 14px;
 		text-align: center;
-		// font-weight: 300;
-		// font-size: 27px;
 	}
 
 	.wrapper {
@@ -20,24 +20,22 @@
 
 		.form {
 			padding: 1.2rem;
-			background: #161b22;
+			background: #2c354217;
 			border-radius: 5px;
 			display: flex;
 			flex-direction: column;
-			border: 1.5px solid #30363d;
+			border: 1.5px solid #47607e;
 
-			// height: 250px;
-			// width: 250px;
 			.username,
 			.email,
 			.password {
 				input {
 					width: 100%;
 					margin-block: 15px;
-					background-color: #0d1117;
+					background-color: #0d111700;
 					padding-inline: 10px;
-					border: 1.5px solid #30363d;
-					color: #c9d1d9;
+					border: 1.5px solid #25364acc;
+					color: #cad2d9;
 
 					&:focus {
 						border: 2px solid #58a6ff;
@@ -55,14 +53,11 @@
 
 			button {
 				margin: 15px 0;
-				background-color: #238636;
-				font-weight: 600;
-				font-size: 1rem;
-				color: #b1eeff;
-				cursor: pointer;
+				background-color: #21557c;
+				@include btnStyles;
 
 				&:hover {
-					background: #2ea043;
+					@include primaryHover;
 				}
 			}
 		}

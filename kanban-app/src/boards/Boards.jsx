@@ -1,14 +1,13 @@
-import React, { useEffect, useState, Fragment } from 'react';
-import Icon from '../common/Icon';
-import BasicAddForm from './AddTaskForm';
+import React, { useState, Fragment } from 'react';
 import './Boards.scss';
-import TaskCard from './TaskCard';
-import { useBoardData } from '../context/BoardDataContext';
-import { removeAndAddToList, reorderList, toggleElementFromSet } from './helper';
-import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { Draggable } from 'react-beautiful-dnd';
+import Icon from '../common/Icon';
+import BasicAddForm from '../tasks/AddTaskForm';
+import TaskCard from '../tasks/TaskCard';
+import { useProjectData, useUI } from '../hooks';
+import { isFalsy, removeAndAddToList, reorderList } from '../lib';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Loader from '../common/Loader';
-
+import { toggleElementFromSet } from './helper';
 const Boards = () => {
 	const [activeBoardIndexes, setActiveBoardIndexes] = useState(new Set([]));
 	const [editingBoardIndexes, setEditingBoardIndexes] = useState(new Set([]));
@@ -19,9 +18,6 @@ const Boards = () => {
 	const [inputs, setInputs] = useState({});
 
 	const {
-		boardDataLoading,
-		boardData,
-		getBoardInformation,
 		deleteBoardInfo,
 		editBoardName,
 		addNewBoard,
@@ -30,7 +26,13 @@ const Boards = () => {
 		deleteTask: deleteTaskContext,
 		editTask,
 		updateListOrder,
-	} = useBoardData();
+		projectDetails,
+		activeProject,
+		addToModifiedBoards,
+		removeFromModifiedBoards,
+	} = useProjectData();
+
+	const { isLoading, showSidebar } = useUI();
 
 	const onAddIconClick = (index) => toggleElementFromSet(activeBoardIndexes, index, setActiveBoardIndexes);
 
@@ -47,11 +49,12 @@ const Boards = () => {
 			boards: [...stack.boards, { _id: boardId }],
 			tasks: [
 				...stack.tasks,
-				...boardData[boardPosition]?.tasks?.map((t) => ({
+				...projectDetails.boards[boardPosition]?.tasks?.map((t) => ({
 					_id: t._id,
 				})),
 			],
 		}));
+		removeFromModifiedBoards(boardPosition);
 		deleteBoardInfo(boardPosition);
 	};
 
@@ -96,6 +99,7 @@ const Boards = () => {
 			...stack,
 			tasks: [...stack.tasks, { _id: task._id }],
 		}));
+		addToModifiedBoards(boardPosition);
 		deleteTaskContext(task, boardPosition);
 	};
 
@@ -110,6 +114,7 @@ const Boards = () => {
 
 	const taskEditSubmitHandler = (boardPos, task_id) => {
 		editTask(boardPos, task_id, taskEditTracker[task_id]);
+		addToModifiedBoards(boardPos);
 		onTaskEditIconClick(task_id);
 		taskEditChangeHandler({ target: { value: '' } }, task_id);
 	};
@@ -120,38 +125,66 @@ const Boards = () => {
 		if (!destination) return;
 
 		if (source.droppableId === destination.droppableId && source.index !== destination.index) {
-			const destId = destination.droppableId;
-			const list = [...boardData[destId]?.tasks];
-
-			updateListOrder(destId, reorderList(list, destination.index, list[source.index]));
+			const destinationBoardPosition = destination.droppableId;
+			const tasks = [...projectDetails.boards[destinationBoardPosition].tasks];
+			const reorderedTasks = reorderList([...tasks], destination.index, tasks[source.index]);
+			addToModifiedBoards(destinationBoardPosition);
+			updateListOrder(destinationBoardPosition, reorderedTasks);
 		} else if (source.droppableId !== destination.droppableId) {
 			const sourceIndex = source.index;
 			const destinationIndex = destination.index;
-			const sourceId = source.droppableId;
-			const destId = destination.droppableId;
-			const sourceList = [...boardData[sourceId].tasks];
-			const destList = [...boardData[destId].tasks];
 
-			sourceList[sourceIndex].board_id = boardData[destId]._id;
+			const sourceBoardPosition = source.droppableId;
+			const destinationBoardPosition = destination.droppableId;
 
-			const modifiedList = removeAndAddToList(sourceList, destList, destinationIndex, sourceList[sourceIndex]);
-			updateListOrder(sourceId, modifiedList.sourceList);
-			updateListOrder(destId, modifiedList.destList);
+			const sourceList = [...projectDetails.boards[sourceBoardPosition].tasks];
+			const destinationList = [...projectDetails.boards[destinationBoardPosition].tasks];
+
+			sourceList[sourceIndex].boardId = projectDetails.boards[destinationBoardPosition]._id;
+
+			const modifiedList = removeAndAddToList(sourceList, destinationList, destinationIndex, sourceList[sourceIndex]);
+
+			addToModifiedBoards(sourceBoardPosition);
+			addToModifiedBoards(destinationBoardPosition);
+
+			updateListOrder(sourceBoardPosition, modifiedList.sourceList);
+			updateListOrder(destinationBoardPosition, modifiedList.destList);
 		} else {
 			return;
 		}
 	};
 
-	useEffect(() => {
-		getBoardInformation();
-	}, []);
+	if (isFalsy(activeProject)) {
+		return (
+			<div
+				style={{
+					height: '100%',
+					width: '100%',
+					display: 'grid',
+					placeItems: 'center',
+					letterSpacing: '1px',
+				}}
+			>
+				<h4
+					style={{
+						fontWeight: 300,
+					}}
+				>
+					No Projects Available!
+					<p className='mt-1'>
+						Click <strong> New </strong> to add one.
+					</p>
+				</h4>
+			</div>
+		);
+	}
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
-			<div className='boards-wrapper'>
-				{!boardDataLoading ? (
+			<div className='boards-wrapper' style={{ marginLeft: showSidebar ? '275px' : '35px' }}>
+				{!isLoading ? (
 					<Fragment>
-						{Object.entries(boardData).map(([boardPos, column], index) => {
+						{Object.entries(projectDetails?.boards ?? {}).map(([boardPos, column], index) => {
 							return (
 								<Droppable key={column._id} droppableId={boardPos}>
 									{(provided, snapshot) => (
@@ -171,7 +204,7 @@ const Boards = () => {
 														<div className='board__edit'>
 															<input
 																onChange={(e) => boardNamesChangeHandler(e, boardPos)}
-																defaultValue={column?.board_name}
+																defaultValue={column?.name}
 															/>
 															<Icon
 																type={'Done'}
@@ -179,7 +212,7 @@ const Boards = () => {
 															/>
 														</div>
 													) : (
-														<span>{column.board_name}</span>
+														<span>{column.name}</span>
 													)}
 												</div>
 												<div className='board__right'>
@@ -229,7 +262,7 @@ const Boards = () => {
 																	style={{
 																		border: snapshot.isDragging ? '2px solid orangered' : '',
 																	}}
-																	taskItem={task.task_item}
+																	taskItem={task?.item}
 																	isEditing={editingTaskIndexes.has(task._id)}
 																	onEditIconClick={() => onTaskEditIconClick(task._id)}
 																	onEditSubmit={() => taskEditSubmitHandler(boardPos, task._id)}

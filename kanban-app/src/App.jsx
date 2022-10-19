@@ -1,5 +1,6 @@
 import { Navigate, Routes, Route } from 'react-router-dom';
 import './App.scss';
+
 import ProtectedRoutes from './common/ProtectedRoute';
 import Auth from './pages/Auth';
 import UserData from './pages/UserData';

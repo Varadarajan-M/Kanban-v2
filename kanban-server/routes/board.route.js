@@ -7,8 +7,8 @@ const router = express.Router();
 
 router.use('/board', router);
 
-router.post('/:id', boardNameValidator, verifyAuth, BoardController.create);
+router.post('/:projectId', boardNameValidator, verifyAuth, BoardController.create);
 
-router.patch('/:id', boardNameValidator, verifyAuth, BoardController.update);
+router.patch('/:projectId/:boardId', boardNameValidator, verifyAuth, BoardController.update);
 
 module.exports = router;

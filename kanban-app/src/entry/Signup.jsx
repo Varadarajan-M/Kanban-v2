@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import AuthForm from './AuthForm';
 import './entry.scss';
-import Footer from './Footer';
 import { signup, isResOk } from './../api/helper';
 
 const Signup = () => {
@@ -24,7 +23,6 @@ const Signup = () => {
 						Already have an account? <Link to='/login'>Sign in</Link>
 					</span>
 				</div>
-				<Footer />
 			</div>
 		</div>
 	);
