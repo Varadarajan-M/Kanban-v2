@@ -14,6 +14,7 @@ const Navbar = () => {
 	const [editOpen, setEditOpen] = useState(false);
 	const [avatarClicked, setAvatarClicked] = useState(false);
 	const [moreOptionsOpen, setMoreOptionsOpen] = useState(false);
+	const [shareModalOpen, setShareModalOpen] = useState(false);
 
 	const {
 		authState: {
@@ -40,6 +41,10 @@ const Navbar = () => {
 	const isSaveDisabled = saveState === 'disabled';
 	const isSaving = saveState === 'saving';
 
+	const closeShareProjectModal = () => setShareModalOpen(false);
+	const openShareProjectModal = () => setShareModalOpen(true);
+	const toggleShareProjectModal = () => setShareModalOpen(!shareModalOpen);
+
 	const deleteProject = () => {
 		if (window.confirm('Are you sure you want to delete this project')) {
 			removeProject();
@@ -59,110 +64,127 @@ const Navbar = () => {
 	};
 
 	return (
-		<div className='navbar__wrapper'>
-			<nav className='navbar'>
-				<select onChange={changeProjectType} className='custom-select'>
-					<option value='My Projects'>My Projects</option>
-					<option value='Shared Projects'>Shared Projects</option>
-				</select>
-				<span className='username hide-md'>{username ?? 'User'} / Kanban App</span>
+		<Fragment>
+			<div className='navbar__wrapper'>
+				<nav className='navbar'>
+					<select onChange={changeProjectType} className='custom-select'>
+						<option value='My Projects'>My Projects</option>
+						<option value='Shared Projects'>Shared Projects</option>
+					</select>
+					<span className='username hide-md'>{username ?? 'User'} / Kanban App</span>
 
-				<div className='nav__buttons'>
-					{!isProjectShared && (
-						<Fragment>
-							<button className='btn new-project' onClick={openAddProjectModal}>
-								New <span className='p hide-md'>Project</span>
-							</button>
-							{!haveNoProjects ? (
-								<>
-									<Icon
-										className='text-light edit'
-										type={'edit_document'}
-										tooltip='Edit Project'
-										onClick={openEditProjectModal}
-									/>{' '}
-									<Icon
-										className='text-light delete'
-										type={'delete'}
-										tooltip='Delete Project'
-										onClick={deleteProject}
-									/>
-									{/* More options Menu only to be visible on smaller screens */}
-									<MenuContainer className='more-options-menu'>
+					<div className='nav__buttons'>
+						{!isProjectShared && (
+							<Fragment>
+								<button className='btn new-project' onClick={openAddProjectModal}>
+									New <span className='p hide-md'>Project</span>
+								</button>
+								{!haveNoProjects ? (
+									<>
 										<Icon
-											className='text-light more-options'
-											type={'more_vert'}
-											tooltip='More Options'
-											onClick={openMoreOptions}
+											className='text-light edit'
+											type={'edit_document'}
+											tooltip='Edit Project'
+											onClick={openEditProjectModal}
+										/>{' '}
+										<Icon
+											className='text-light delete'
+											type={'delete'}
+											tooltip='Delete Project'
+											onClick={deleteProject}
 										/>
-										{moreOptionsOpen ? (
-											<Menu
-												style={{ margin: '16px 0 0 -62px' }}
-												onBlur={() => setTimeout(closeMoreOptions, 200)}
+										{/* More options Menu only to be visible on smaller screens */}
+										<MenuContainer className='more-options-menu'>
+											<Icon
+												className='text-light more-options'
+												type={'more_vert'}
+												tooltip='More Options'
+												onClick={openMoreOptions}
+											/>
+											{moreOptionsOpen ? (
+												<Menu
+													style={{ margin: '16px 0 0 -62px' }}
+													onBlur={() => setTimeout(closeMoreOptions, 200)}
+												>
+													<MenuItem onClick={openEditProjectModal}>Edit Project</MenuItem>
+													<MenuItem onClick={deleteProject}>Delete Project</MenuItem>
+													<MenuItem onClick={openShareProjectModal}>Share Project</MenuItem>
+												</Menu>
+											) : (
+												''
+											)}
+										</MenuContainer>
+										<div className='nav__save_btn d-flex'>
+											<Icon
+												className='text-light save-icon'
+												disabled={isSaveDisabled || isSaving}
+												type={'save'}
+												tooltip='Save Changes'
+												onClick={saveChanges}
+											/>
+											<button
+												disabled={isSaveDisabled || isSaving}
+												className='save-btn'
+												onClick={saveChanges}
 											>
-												<MenuItem onClick={openEditProjectModal}>Edit Project</MenuItem>
-												<MenuItem onClick={deleteProject}>Delete Project</MenuItem>
-											</Menu>
-										) : (
-											''
-										)}
-									</MenuContainer>
-									<div className='nav__save_btn d-flex'>
-										<Icon
-											className='text-light save-icon'
-											disabled={isSaveDisabled || isSaving}
-											type={'save'}
-											tooltip='Save Changes'
-											onClick={saveChanges}
-										/>
-										<button disabled={isSaveDisabled || isSaving} className='save-btn' onClick={saveChanges}>
-											Save
-										</button>
-									</div>
-								</>
+												Save
+											</button>
+										</div>
+									</>
+								) : (
+									''
+								)}
+							</Fragment>
+						)}
+						<MenuContainer className={haveNoProjects ? 'ml-2' : ''}>
+							<Avatar onClick={openAvatarMenu} text={username} />
+							{avatarClicked ? (
+								<Menu style={{ margin: '16px 0px 0px -34px' }} onBlur={() => setTimeout(closeAvatarMenu, 100)}>
+									<MenuItem
+										onClick={() => {
+											clearAuthState();
+											navigate('/', { replace: true });
+										}}
+									>
+										Log out{' '}
+									</MenuItem>
+								</Menu>
 							) : (
 								''
 							)}
-						</Fragment>
-					)}
-					<MenuContainer className={haveNoProjects ? 'ml-2' : ''}>
-						<Avatar onClick={openAvatarMenu} text={username} />
-						{avatarClicked ? (
-							<Menu style={{ margin: '16px 0px 0px -34px' }} onBlur={() => setTimeout(closeAvatarMenu, 100)}>
-								<MenuItem
-									onClick={() => {
-										clearAuthState();
-										navigate('/', { replace: true });
-									}}
-								>
-									Log out{' '}
-								</MenuItem>
-							</Menu>
-						) : (
-							''
-						)}
-					</MenuContainer>
-				</div>
-			</nav>
+						</MenuContainer>
+					</div>
+				</nav>
 
-			<Modals.AddProjectModal
-				open={addOpen}
-				onBackdropClick={closeAddProjectModal}
-				title={'Create Project'}
-				primaryButton={'Create'}
-				secondaryButton={'Discard'}
-				onSecondaryClick={closeAddProjectModal}
-			/>
-			<Modals.EditProjectModal
-				open={editOpen}
-				onBackdropClick={closeEditProjectModal}
-				title={`Edit ${projectDetails?.name}`}
-				primaryButton={'Update'}
-				secondaryButton={'Discard'}
-				onSecondaryClick={closeEditProjectModal}
-				defaultValues={{ name: projectDetails?.name }}
-			/>
-		</div>
+				<Modals.AddProjectModal
+					open={addOpen}
+					onBackdropClick={closeAddProjectModal}
+					title={'Create Project'}
+					primaryButton={'Create'}
+					secondaryButton={'Discard'}
+					onSecondaryClick={closeAddProjectModal}
+				/>
+				<Modals.EditProjectModal
+					open={editOpen}
+					onBackdropClick={closeEditProjectModal}
+					title={`Edit ${projectDetails?.name}`}
+					primaryButton={'Update'}
+					secondaryButton={'Discard'}
+					onSecondaryClick={closeEditProjectModal}
+					defaultValues={{ name: projectDetails?.name }}
+				/>
+
+				<Modals.ShareProjectModal
+					open={shareModalOpen}
+					onBackdropClick={closeShareProjectModal}
+					title={`Share ${projectDetails?.name}`}
+					primaryButton={'Share'}
+					secondaryButton={'Discard'}
+					onSecondaryClick={closeShareProjectModal}
+				/>
+			</div>
+			<Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} />
+		</Fragment>
 	);
 };
 
