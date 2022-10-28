@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../common/Modal';
-import { useKeyboardNavigation, useLog, useProjectData } from '../hooks';
+import { useDebounceValue, useKeyboardNavigation, useLog, useProjectData } from '../hooks';
 import { isNotFalsy, isStrFalsy, isStrEmpty } from '../lib';
 import { ProjectForm } from './ProjectForm';
 import Icon from '../common/Icon';
@@ -51,34 +51,43 @@ const EditProjectModal = ({ project, clearValue, changeHandler, ...restProps }) 
 		</Modal>
 	);
 };
+
+const DEMO_USERS = [
+	{
+		id: 1,
+		username: 'joey',
+		email: 'joey@gmail.com',
+	},
+	{
+		id: 2,
+		username: 'ross',
+		email: 'ross@gmail.com',
+	},
+	{ id: 3, username: 'phoebe', email: 'phoebe@gmail.com' },
+	{ id: 4, username: 'mike', email: 'mike@gmail.com' },
+	{ id: 5, username: 'chandler', email: 'chandler@gmail.com' },
+];
+
 const ShareProjectModal = (props) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sharedUsers, setSharedUsers] = useState(props.sharedUsers ?? []);
 	const [suggestions, setSuggestions] = useState([]);
 	const itemRef = useRef(null);
 
-	const DEMO_USERS = [
-		{
-			id: 1,
-			username: 'joey',
-			email: 'joey@gmail.com',
-		},
-		{
-			id: 2,
-			username: 'ross',
-			email: 'ross@gmail.com',
-		},
-		{ id: 3, username: 'phoebe', email: 'phoebe@gmail.com' },
-		{ id: 4, username: 'mike', email: 'mike@gmail.com' },
-		{ id: 5, username: 'chandler', email: 'chandler@gmail.com' },
-	];
+	// to prevent api calls for each key stroke
+	const debouncedSearchTerm = useDebounceValue(searchTerm, 700);
+
+	// api call simulation
+	const fetchUsersApi = (v) => {
+		return new Promise((res) =>
+			setTimeout(() => res(DEMO_USERS.filter((u) => u.username?.toLowerCase().includes(v?.toLowerCase()))), 400),
+		);
+	};
 
 	const searchHandler = (e) => {
 		const { value } = e.target;
 		setSearchTerm((v) => value);
-
-		// API call to search
-		setSuggestions((_) => DEMO_USERS.filter((u) => u.username?.toLowerCase().includes(value.toLowerCase())));
+		setCursor(-1);
 	};
 
 	const clearSearchTerm = () => setSearchTerm('');
@@ -89,7 +98,8 @@ const ShareProjectModal = (props) => {
 	};
 
 	const onEnter = (idx) => suggestions.find((s) => searchTerm === s.username) && onSelection(idx);
-	const [cursor, keyDownHandler] = useKeyboardNavigation({ onEnter: onEnter, dataset: suggestions });
+
+	const [cursor, setCursor, keyDownHandler] = useKeyboardNavigation({ onEnter: onEnter, dataset: suggestions });
 
 	useEffect(() => {
 		if (!!suggestions.length && cursor !== -1 && cursor < suggestions.length) {
@@ -105,6 +115,15 @@ const ShareProjectModal = (props) => {
 	useEffect(() => {
 		isStrEmpty(searchTerm) && setSuggestions([]);
 	}, [searchTerm]);
+
+	// calls api only when the debouncedValue of searchTerm is changed
+	useEffect(() => {
+		!isStrEmpty(debouncedSearchTerm) &&
+			cursor === -1 &&
+			fetchUsersApi(debouncedSearchTerm).then((results) => {
+				setSuggestions(() => results);
+			});
+	}, [debouncedSearchTerm]);
 
 	const removeSharedUser = (idx) => setSharedUsers((users) => users.filter((_, i) => i !== idx));
 

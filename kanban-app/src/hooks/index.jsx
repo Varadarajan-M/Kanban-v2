@@ -59,11 +59,20 @@ export const useKeyboardNavigation = ({ onEnter, dataset }) => {
 		}
 	};
 
-	return [cursor, keyDownHandler];
+	return [cursor, setCursor, keyDownHandler];
 };
 
 export const useLog = (value) => {
 	useEffect(() => {
 		console.log(`Value changed, new value: ${JSON.stringify(value, null, 2)}`);
 	}, [value]);
+};
+
+export const useDebounceValue = (value, ms) => {
+	const [debouncedValue, setDebouncedValue] = useState(value);
+	useEffect(() => {
+		let timer = setTimeout(() => setDebouncedValue(value), ms);
+		return () => clearTimeout(timer);
+	}, [value, ms]);
+	return debouncedValue;
 };
