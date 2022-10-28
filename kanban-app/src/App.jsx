@@ -1,4 +1,6 @@
 import { Navigate, Routes, Route } from 'react-router-dom';
+import './spectrecss/spectre.min.css';
+import './spectrecss/spectre-icons.min.css';
 import './App.scss';
 
 import ProtectedRoutes from './common/ProtectedRoute';

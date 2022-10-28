@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../common/Modal';
-import { useProjectData } from '../hooks';
-import { isNotFalsy } from '../lib';
+import { useKeyboardNavigation, useLog, useProjectData } from '../hooks';
+import { isNotFalsy, isStrFalsy, isStrEmpty } from '../lib';
 import { ProjectForm } from './ProjectForm';
+import Icon from '../common/Icon';
 
 // HOC which provides the project details
 const withProjectDetails = (Component) => {
@@ -24,7 +25,7 @@ const withProjectDetails = (Component) => {
 const AddProjectModal = ({ project, clearValue, changeHandler, ...restProps }) => {
 	const { addProject } = useProjectData();
 	const onAdd = () => {
-		addProject(project);
+		isStrFalsy(project?.name) ? addProject({}) : addProject(project);
 		clearValue('name');
 		restProps.onBackdropClick();
 	};
@@ -50,86 +51,45 @@ const EditProjectModal = ({ project, clearValue, changeHandler, ...restProps }) 
 		</Modal>
 	);
 };
-
 const ShareProjectModal = (props) => {
 	const [searchTerm, setSearchTerm] = useState('');
 	const [sharedUsers, setSharedUsers] = useState(props.sharedUsers ?? []);
 	const [suggestions, setSuggestions] = useState([]);
-	const [cursor, setCursor] = useState(-1);
 	const itemRef = useRef(null);
 
 	const DEMO_USERS = [
 		{
+			id: 1,
 			username: 'joey',
 			email: 'joey@gmail.com',
 		},
 		{
+			id: 2,
 			username: 'ross',
 			email: 'ross@gmail.com',
 		},
-		{
-			username: 'phoebe',
-			email: 'phoebe@gmail.com',
-		},
-		{
-			username: 'mike',
-			email: 'mike@gmail.com',
-		},
-		{
-			username: 'chandler',
-			email: 'chandler@gmail.com',
-		},
+		{ id: 3, username: 'phoebe', email: 'phoebe@gmail.com' },
+		{ id: 4, username: 'mike', email: 'mike@gmail.com' },
+		{ id: 5, username: 'chandler', email: 'chandler@gmail.com' },
 	];
 
 	const searchHandler = (e) => {
 		const { value } = e.target;
 		setSearchTerm((v) => value);
 
+		// API call to search
 		setSuggestions((_) => DEMO_USERS.filter((u) => u.username?.toLowerCase().includes(value.toLowerCase())));
 	};
 
-	const onSelect = (idx) => {
-		setSharedUsers((users) => [...users, suggestions[idx].username]);
-		setSearchTerm('');
+	const clearSearchTerm = () => setSearchTerm('');
+	const onSelection = (idx) => {
+		!sharedUsers.find((s) => suggestions[idx].id === s.id) && setSharedUsers((users) => [...users, suggestions[idx]]);
+		clearSearchTerm();
 		setSuggestions([]);
-		setCursor(-1);
 	};
 
-	const keyUpHandler = (e) => {
-		switch (e.key) {
-			case 'Backspace':
-				setCursor(-1);
-				break;
-			case 'Enter':
-				if (cursor > -1 && cursor < suggestions.length && suggestions.find((s) => searchTerm === s.username)) {
-					setSharedUsers((users) => [...users, suggestions[cursor].username]);
-					setSearchTerm('');
-					setSuggestions([]);
-					setCursor(-1);
-				}
-				break;
-			case 'ArrowDown':
-				if (cursor < suggestions.length - 1) {
-					setCursor((c) => c + 1);
-				} else if (cursor === suggestions.length - 1) {
-					setCursor((c) => 0);
-				} else {
-					return;
-				}
-				break;
-			case 'ArrowUp':
-				if (cursor > 0) {
-					setCursor((c) => c - 1);
-				} else if (cursor === 0) {
-					setCursor((c) => suggestions.length - 1);
-				} else {
-					return;
-				}
-				break;
-			default:
-				return;
-		}
-	};
+	const onEnter = (idx) => suggestions.find((s) => searchTerm === s.username) && onSelection(idx);
+	const [cursor, keyDownHandler] = useKeyboardNavigation({ onEnter: onEnter, dataset: suggestions });
 
 	useEffect(() => {
 		if (!!suggestions.length && cursor !== -1 && cursor < suggestions.length) {
@@ -142,25 +102,35 @@ const ShareProjectModal = (props) => {
 		props.open ? (document.body.style.overflow = 'hidden') : (document.body.style.overflow = 'auto');
 	}, [props.open]);
 
+	useEffect(() => {
+		isStrEmpty(searchTerm) && setSuggestions([]);
+	}, [searchTerm]);
+
+	const removeSharedUser = (idx) => setSharedUsers((users) => users.filter((_, i) => i !== idx));
+
 	return (
 		<div className='shareProjectModal'>
 			<Modal {...props}>
 				<div className='search-box'>
 					<label htmlFor='search'>Share with</label>
-					<input
-						onKeyDown={keyUpHandler}
-						onChange={searchHandler}
-						value={searchTerm}
-						type='text'
-						id='search'
-						className='form-input'
-						autoComplete='off'
-					/>
+					<div className='input-wrapper'>
+						<input
+							onKeyDown={keyDownHandler}
+							onChange={searchHandler}
+							value={searchTerm}
+							type='text'
+							id='search'
+							className='form-input'
+							autoComplete='off'
+							placeholder='Start typing the username...'
+						/>
+						<Icon tooltip={'Clear '} onClick={clearSearchTerm} type='close' />
+					</div>
 
 					<div className='suggestions'>
 						{suggestions.map((suggestion, i) => (
 							<p
-								onClick={() => onSelect(i)}
+								onClick={() => onSelection(i)}
 								ref={i === cursor ? itemRef : null}
 								key={i}
 								style={{ paddingBlock: '10px', paddingLeft: '8px', background: i === cursor ? 'black' : '' }}
@@ -176,7 +146,7 @@ const ShareProjectModal = (props) => {
 						<div>
 							{sharedUsers.map((user, i) => (
 								<span key={i} className='chip'>
-									{user} <span className='btn btn-clear'></span>
+									{user.username} <span className='btn btn-clear' onClick={() => removeSharedUser(i)}></span>
 								</span>
 							))}
 						</div>
