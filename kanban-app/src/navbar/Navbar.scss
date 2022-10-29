@@ -32,7 +32,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 			letter-spacing: 1px;
 			text-transform: capitalize;
 			zoom: 1.1;
-			color: rgb(243, 186, 214);
+			color: rgb(255 255 255 / 84%);
 		}
 
 		.navbar__project-select {
@@ -71,7 +71,7 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				}
 
 				&:hover {
-					@include primaryHover
+					@include primaryHover;
 				}
 			}
 

@@ -27,6 +27,7 @@ const ProjectContextProvider = ({ children }) => {
 	const [saveState, setSaveState] = useState('disabled');
 	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
 	const [modifiedBoards, setModifiedBoards] = useState(new Set([]));
+	const [isProjectShared, setIsProjectShared]= useState(false);
 
 	const isSaveDisabled = saveState === 'disabled';
 
@@ -300,6 +301,8 @@ const ProjectContextProvider = ({ children }) => {
 				activeProject,
 				addToModifiedBoards,
 				removeFromModifiedBoards,
+				isProjectShared, 
+				setIsProjectShared
 			}}
 		>
 			{children}

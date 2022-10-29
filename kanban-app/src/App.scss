@@ -172,6 +172,20 @@ button {
 
 .modal-container {
 	background: #66758c30 !important;
+
+	display: flex;
+	flex-direction: column;
+
+	.modal-header {
+		flex-basis: 10%;
+		margin-bottom: 5px;
+	}
+	.modal-body {
+		flex-basis: 70%;
+	}
+	.modal-footer {
+		flex-basis: 10%;
+	}
 }
 
 .modal-footer {
@@ -204,12 +218,10 @@ textarea,
 	}
 }
 
-
 .primaryBtn,
 .secondaryBtn {
-	@include btnStyles
+	@include btnStyles;
 }
-
 
 .primaryBtn {
 	background: $primaryBtn;
@@ -221,12 +233,81 @@ textarea,
 }
 
 .secondaryBtn {
-
 	background: rgba($secondaryBtn, 0.6);
 	transition: background 0.2s ease-in !important;
 
-
 	&:hover {
 		@include secondaryHover;
+	}
+}
+
+.shareProjectModal {
+	.modal-container {
+		height: 400px;
+	}
+	.modal {
+		.search-box {
+			position: relative;
+			width: 100%;
+			margin: 10px 0;
+			.input-wrapper {
+				position: relative;
+				input {
+					width: 100%;
+					padding-right: 20px;
+				}
+				span {
+					position: absolute;
+					right: 0;
+					top: 50%;
+					transform: translateY(-50%);
+					background-color: inherit;
+					color: #c9cfd7;
+
+					&:hover {
+						color: #c9cfd7;
+					}
+				}
+			}
+			.suggestions {
+				position: absolute;
+				top: 100%;
+				left: 0;
+				width: 100%;
+				max-height: 200px;
+				overflow-y: auto;
+				margin-top: 3px;
+				border-radius: 10px;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+				background-color: #00a8ff29;
+				z-index: 5;
+			}
+		}
+		.chip-input-container {
+			padding: 4px 0 10px 4px;
+			border-radius: 5px;
+			background-color: #303544f2;
+			min-height: 50px;
+			.chip {
+				background-color: black;
+				color: rgb(220, 209, 209);
+			}
+		}
+	}
+}
+@media screen and (min-width: 501px) {
+	.shareIcon {
+		pointer-events: auto;
+		opacity: 1;
+		position: fixed;
+		font-size: 26px;
+		z-index: 3;
+		right: 21px;
+		bottom: 30px;
+		background: #0c8cab;
+		border-radius: 50%;
+		padding: 14px;
+		color: white;
+		font-weight: bold;
 	}
 }

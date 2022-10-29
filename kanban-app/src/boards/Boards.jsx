@@ -30,6 +30,7 @@ const Boards = () => {
 		activeProject,
 		addToModifiedBoards,
 		removeFromModifiedBoards,
+		isProjectShared,
 	} = useProjectData();
 
 	const { isLoading, showSidebar } = useUI();
@@ -120,6 +121,8 @@ const Boards = () => {
 	};
 
 	const onDragEnd = (e) => {
+		if (isProjectShared) return;
+
 		const source = e.source;
 		const destination = e.destination;
 		if (!destination) return;
@@ -200,7 +203,7 @@ const Boards = () => {
 											<div className='board__header'>
 												<div className='board__left'>
 													<div className='board__items-length'>{column?.tasks?.length}</div>{' '}
-													{editingBoardIndexes.has(index) ? (
+													{!isProjectShared && editingBoardIndexes.has(index) ? (
 														<div className='board__edit'>
 															<input
 																onChange={(e) => boardNamesChangeHandler(e, boardPos)}
@@ -215,23 +218,25 @@ const Boards = () => {
 														<span>{column.name}</span>
 													)}
 												</div>
-												<div className='board__right'>
-													<Icon
-														onClick={() => onAddIconClick(index)}
-														type={activeBoardIndexes.has(index) ? 'remove' : 'add'}
-														tooltip={'Add a new item to the board'}
-													/>
-													<Icon
-														onClick={() => onEditIconClick(index, boardPos)}
-														type={editingBoardIndexes.has(index) ? 'close' : 'edit'}
-														tooltip={'Edit board name'}
-													/>
-													<Icon
-														onClick={() => onBoardDelete(column._id, boardPos)}
-														type='delete'
-														tooltip={'Delete board'}
-													/>
-												</div>
+												{!isProjectShared && (
+													<div className='board__right'>
+														<Icon
+															onClick={() => onAddIconClick(index)}
+															type={activeBoardIndexes.has(index) ? 'remove' : 'add'}
+															tooltip={'Add a new item to the board'}
+														/>
+														<Icon
+															onClick={() => onEditIconClick(index, boardPos)}
+															type={editingBoardIndexes.has(index) ? 'close' : 'edit'}
+															tooltip={'Edit board name'}
+														/>
+														<Icon
+															onClick={() => onBoardDelete(column._id, boardPos)}
+															type='delete'
+															tooltip={'Delete board'}
+														/>
+													</div>
+												)}
 											</div>
 
 											<div className='board__tasks'>
@@ -281,24 +286,26 @@ const Boards = () => {
 							);
 						})}
 
-						<div className='board add__new'>
-							<div className='title' onClick={toggleBoardAdd}>
-								{' '}
-								<Icon type={isAddingBoard ? 'Remove' : 'Add'} />
-								<span role='button'> Add New Board</span>{' '}
+						{!isProjectShared && (
+							<div className='board add__new'>
+								<div className='title' onClick={toggleBoardAdd}>
+									{' '}
+									<Icon type={isAddingBoard ? 'Remove' : 'Add'} />
+									<span role='button'> Add New Board</span>{' '}
+								</div>
+								{isAddingBoard ? (
+									<BasicAddForm
+										value={inputs?.newBoard ?? ''}
+										changeHandler={addBoardChangeHandler}
+										onAddClick={addBoardSubmitHandler}
+										placeholder={'Enter new board name'}
+										onCancelClick={toggleBoardAdd}
+									/>
+								) : (
+									''
+								)}
 							</div>
-							{isAddingBoard ? (
-								<BasicAddForm
-									value={inputs?.newBoard ?? ''}
-									changeHandler={addBoardChangeHandler}
-									onAddClick={addBoardSubmitHandler}
-									placeholder={'Enter new board name'}
-									onCancelClick={toggleBoardAdd}
-								/>
-							) : (
-								''
-							)}
-						</div>
+						)}
 					</Fragment>
 				) : (
 					<Loader />
