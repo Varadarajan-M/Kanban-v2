@@ -1,11 +1,11 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const {
   hashPassword,
   isSame,
   isStrFalsy,
   isPasswordMatching,
-} = require('../helper');
-const User = require('../models/user.model');
+} = require("../helper");
+const User = require("../models/user.model");
 const ERROR_RESPONSE = {
   ok: false,
 };
@@ -38,7 +38,7 @@ exports.login = async ({ email, password }) => {
       const token = jwt.sign(
         { userID: user._id, email: user.email },
         process.env.SECRET,
-        { expiresIn: '30m' }
+        { expiresIn: "30m" }
       );
 
       return {
@@ -52,6 +52,24 @@ exports.login = async ({ email, password }) => {
     }
     return ERROR_RESPONSE;
   } catch (e) {
+    return ERROR_RESPONSE;
+  }
+};
+exports.fetchUsers = async (name) => {
+  try {
+    let users;
+    if (!name) {
+      users = await User.find({}, { username: 1, email: 1 });
+    } else {
+      users = await User.find(
+        { username: { $regex: name, $options: "i" } },
+        { username: 1, email: 1 }
+      );
+    }
+
+    return { ok: true, users };
+  } catch (e) {
+    console.log(e);
     return ERROR_RESPONSE;
   }
 };
