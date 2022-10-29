@@ -2,7 +2,8 @@ const { isFalsy, sortBy, isArrayNotEmpty } = require('../helper');
 const Board = require('../models/board.model');
 const Project = require('../models/project.model');
 const { Task } = require('../models/task.model');
-const { isBoardOwner } = require('./shared.service');
+const ShareService = require('./shared.service');
+const { isBoardOwner } = ShareService;
 
 const mongoose = require('mongoose');
 
