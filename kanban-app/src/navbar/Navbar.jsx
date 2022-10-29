@@ -183,7 +183,7 @@ const Navbar = () => {
 					onSecondaryClick={closeShareProjectModal}
 				/>
 			</div>
-			<Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} />
+			{!isProjectShared ? <Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} /> : ''}
 		</Fragment>
 	);
 };

@@ -22,26 +22,25 @@
 		}
 
 		p.active {
-			color: hotpink;
-			border-bottom: 1.5px solid #ff0683;
+			color: #4ea1ff;
+			border-bottom: 1.5px solid #35669d;
 		}
 
 		p.inactive {
-			transition: all 0.7s ease-in;
+			transition: all 0.3s ease-in;
 
 			&:hover {
 				transform: scale(1.01);
-				color: #ff0683 !important;
+				color: #4ea1ff !important;
 			}
 
 			&::after {
-				background: #ff0683;
+				background: #35669d;
 				border-radius: 20px;
 				content: '';
 				display: block;
 				height: 1.5px;
 				transition: all 0.2s ease-in;
-				text-shadow: #c9d1d9;
 				width: 0;
 			}
 
@@ -70,9 +69,6 @@
 				&:focus {
 					border: 1.5px solid $lightgreen;
 				}
-
-
-
 			}
 
 			.form-icon {
@@ -88,16 +84,16 @@
 			.icon-close {
 				cursor: pointer;
 
-
 				&::before {
-					background: #005c4b;
+					background: #ffeeeebd;
 					height: 0.1rem;
-					width: 100%;
+					width: 88%;
 				}
 
 				&::after {
-					background: #005c4b;
-					height: 100%;
+					background: #ffeeeebd;
+
+					height: 88%;
 					width: 0.1rem;
 				}
 
@@ -107,20 +103,17 @@
 				}
 			}
 
-
 			span {
 				position: absolute;
 				right: 0.8rem;
 				top: 0.6rem;
-
-
 			}
 		}
 
 		span {
 			margin: auto;
 			cursor: pointer;
-			color: $lightgreen;
+			color: #ffeeeebd;
 		}
 	}
 }
