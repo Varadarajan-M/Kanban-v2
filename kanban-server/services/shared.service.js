@@ -4,25 +4,30 @@ const {
   isSame,
   isStrFalsy,
   isPasswordMatching,
-} = require('../helper');
-const SharedProjectUsers = require('../models/shared.project.users.model');
+} = require("../helper");
+const SharedProjectUsers = require("../models/shared.project.users.model");
 const ERROR_RESPONSE = {
   ok: false,
 };
 
-const Board = require('../models/board.model');
+const Board = require("../models/board.model");
 
 exports.isBoardOwner = async (userId, boardId) =>
   !isFalsy(await Board.exists({ _id: boardId, user_id: userId }));
 
-exports.fetchSharedProjects = async (name) => {
+exports.fetchSharedProjects = async (userId, name) => {
   try {
+    if (!userId) {
+      return ERROR_RESPONSE;
+    }
     let projects;
     if (!name) {
-      projects = await SharedProjectUsers.find();
+      projects = await SharedProjectUsers.aggregate([
+        { $match: { users: { $in: [userId] } } },
+      ]);
     } else {
       projects = await SharedProjectUsers.find({
-        name: { $regex: name, $options: 'i' },
+        name: { $regex: name, $options: "i" },
       });
     }
 
@@ -32,5 +37,3 @@ exports.fetchSharedProjects = async (name) => {
     return ERROR_RESPONSE;
   }
 };
-
-
