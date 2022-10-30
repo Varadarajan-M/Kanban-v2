@@ -4,13 +4,14 @@ const {
   isSame,
   isStrFalsy,
   isPasswordMatching,
-} = require("../helper");
-const SharedProjectUsers = require("../models/shared.project.users.model");
+} = require('../helper');
+const SharedProjectUsers = require('../models/shared.project.users.model');
 const ERROR_RESPONSE = {
   ok: false,
 };
 
-const Board = require("../models/board.model");
+const Board = require('../models/board.model');
+const mongoose = require('mongoose');
 
 exports.isBoardOwner = async (userId, boardId) =>
   !isFalsy(await Board.exists({ _id: boardId, user_id: userId }));
@@ -23,11 +24,11 @@ exports.fetchSharedProjects = async (userId, name) => {
     let projects;
     if (!name) {
       projects = await SharedProjectUsers.aggregate([
-        { $match: { users: { $in: [userId] } } },
+        { $match: { users: { $in: [mongoose.Types.ObjectId(userId)] } } },
       ]);
     } else {
       projects = await SharedProjectUsers.find({
-        name: { $regex: name, $options: "i" },
+        name: { $regex: name, $options: 'i' },
       });
     }
 

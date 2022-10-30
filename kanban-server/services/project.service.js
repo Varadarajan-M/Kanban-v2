@@ -6,6 +6,7 @@ const ShareService = require('./shared.service');
 const { isBoardOwner } = ShareService;
 
 const mongoose = require('mongoose');
+const SharedProjectUsers = require('../models/shared.project.users.model');
 
 const ERROR_RESPONSE = {
   ok: false,
@@ -50,13 +51,16 @@ exports.get = async function (userId) {
 
 exports.getOne = async function (projectId, userId) {
   const projectOwner = await isProjectOwner(projectId, userId);
-  if (!projectOwner) return ERROR_RESPONSE;
+  const sharedUser = await SharedProjectUsers.exists({
+    users: { $in: [mongoose.Types.ObjectId(userId)] },
+  });
+  if (!projectOwner && !sharedUser) return ERROR_RESPONSE;
 
   try {
     const projectDetails = await Project.aggregate([
       {
         $match: {
-          userId: mongoose.Types.ObjectId(userId),
+          // userId: mongoose.Types.ObjectId(userId),    // This is removed as we have done the validation in line 57
           _id: mongoose.Types.ObjectId(projectId),
         },
       },
