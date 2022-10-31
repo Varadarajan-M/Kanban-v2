@@ -10,19 +10,19 @@ const TaskSchema = new mongoose.Schema(
       type: Number,
     },
     boardId: {
-      type: mongoose.Types.ObjectId,
+      type:  mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Board",
     },
     userId: {
-      type: mongoose.Types.ObjectId,
+      type:  mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
   },
   { timestamps: true }
 );
 
-const Task = mongoose.model("Tasks", TaskSchema);
+const Task = mongoose.model("Task", TaskSchema);
 
 module.exports = {
   TaskSchema,
