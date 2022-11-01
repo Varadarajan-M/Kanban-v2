@@ -1,14 +1,12 @@
+const mongoose = require('mongoose');
 const { isFalsy, sortBy, isArrayNotEmpty } = require('../helper');
 const Board = require('../models/board.model');
 const Project = require('../models/project.model');
 const { Task } = require('../models/task.model');
 const ShareService = require('./shared.service');
-const { isBoardOwner } = ShareService;
-
-const mongoose = require('mongoose');
 const SharedProjectUsers = require('../models/shared.project.users.model');
-const User = require('../models/user.model');
 
+const { isBoardOwner } = ShareService;
 const ERROR_RESPONSE = {
 	ok: false,
 };
@@ -49,6 +47,7 @@ exports.get = async function (userId) {
 exports.getOne = async function (projectId, userId) {
 	const projectOwner = await isProjectOwner(projectId, userId);
 	const sharedUser = await SharedProjectUsers.exists({
+		projectId,
 		users: { $in: [mongoose.Types.ObjectId(userId)] },
 	});
 	if (!projectOwner && !sharedUser) return ERROR_RESPONSE;
@@ -100,6 +99,7 @@ exports.create = async function (projectDets, userId) {
 		return ERROR_RESPONSE;
 	}
 };
+
 exports.update = async function (projectId, { name }, userId) {
 	const projectOwner = await isProjectOwner(projectId, userId);
 
@@ -114,6 +114,7 @@ exports.update = async function (projectId, { name }, userId) {
 		return ERROR_RESPONSE;
 	}
 };
+
 exports.delete = async function (projectId, userId) {
 	const projectOwner = await isProjectOwner(projectId, userId);
 	if (!projectOwner) return ERROR_RESPONSE;
@@ -169,7 +170,6 @@ exports.getSharedUsers = async function (projectId, userId) {
 	try {
 		const projectOwner = await isProjectOwner(projectId, userId);
 		if (!projectOwner) return ERROR_RESPONSE;
-
 		const users = await SharedProjectUsers.find({ projectId }).populate('users', '-hash');
 		return {
 			ok: true,

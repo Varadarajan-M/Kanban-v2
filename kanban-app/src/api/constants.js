@@ -13,3 +13,7 @@ export const BOARD_URL = `${BASE_URL}/board`;
 export const TASK_URL = `${BASE_URL}/task`;
 
 export const SAVE_PROJECT_URL = `${PROJECT_URL}/save`;
+
+export const SHARED_URL = `${BASE_URL}/shared`;
+
+export const SHARED_PROJECTS_URL = `${SHARED_URL}/fetch`;

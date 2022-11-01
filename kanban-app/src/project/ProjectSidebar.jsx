@@ -5,7 +5,7 @@ import './ProjectSidebar.scss';
 
 const ProjectSidebar = () => {
 	const [searchItem, setSearchItem] = useState('');
-	const { getProjectList, projectList, projectDetails, switchProject } = useProjectData();
+	const { getProjectList, projectList, projectDetails, switchProject, isProjectShared } = useProjectData();
 	const { showSidebar, toggleSidebar, closeSidebar, openSidebar } = useUI();
 
 	const inputRef = useRef(null);
@@ -45,7 +45,7 @@ const ProjectSidebar = () => {
 
 	useEffect(() => {
 		getProjectList?.();
-	}, []);
+	}, [isProjectShared]);
 
 	return (
 		<aside className='project__sidebar' style={{ left: showSidebar ? 0 : '-215px' }}>

@@ -7,6 +7,7 @@ import {
 	createBoard,
 	updateBoard,
 	getAllProjects,
+	getAllSharedProjects,
 	getOneProject,
 	saveProject,
 	createTask,
@@ -27,7 +28,7 @@ const ProjectContextProvider = ({ children }) => {
 	const [saveState, setSaveState] = useState('disabled');
 	const [deletedStack, setDeletedStack] = useState({ boards: [], tasks: [] });
 	const [modifiedBoards, setModifiedBoards] = useState(new Set([]));
-	const [isProjectShared, setIsProjectShared]= useState(false);
+	const [isProjectShared, setIsProjectShared] = useState(false);
 
 	const isSaveDisabled = saveState === 'disabled';
 
@@ -109,12 +110,10 @@ const ProjectContextProvider = ({ children }) => {
 	};
 
 	const getProjectList = async () => {
-		const res = await getAllProjects(getUserToken());
+		const res = !isProjectShared ? await getAllProjects(getUserToken()) : await getAllSharedProjects(getUserToken());
 		if (isResOk(res)) {
-			if (!isArrayEmpty(res?.payload)) {
-				setActiveProject(res.payload[0]?._id);
-				setProjectList(res.payload);
-			}
+			isArrayEmpty(res?.payload) ? setActiveProject(null) : setActiveProject(res.payload[0]?._id);
+			setProjectList(res.payload);
 		} else {
 			clearAuthState();
 			navigate('/login', { replace: true });
@@ -301,8 +300,8 @@ const ProjectContextProvider = ({ children }) => {
 				activeProject,
 				addToModifiedBoards,
 				removeFromModifiedBoards,
-				isProjectShared, 
-				setIsProjectShared
+				isProjectShared,
+				setIsProjectShared,
 			}}
 		>
 			{children}

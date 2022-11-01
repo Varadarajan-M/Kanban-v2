@@ -1,4 +1,4 @@
-import { LOGIN_URL, SIGN_UP_URL, PROJECT_URL, SAVE_PROJECT_URL, BOARD_URL, TASK_URL } from './constants';
+import { LOGIN_URL, SIGN_UP_URL, PROJECT_URL, SAVE_PROJECT_URL, BOARD_URL, TASK_URL , SHARED_PROJECTS_URL} from './constants';
 import { isStrNotFalsy } from '../lib';
 
 // Local Storage
@@ -66,6 +66,10 @@ export const signup = async (userCreds) => {
 
 export const getAllProjects = async (accessToken) => {
 	const res = await makeHttpReq(PROJECT_URL, makeHttpOptions('GET', {}, accessToken));
+	return res;
+};
+export const getAllSharedProjects = async (accessToken) => {
+	const res = await makeHttpReq(SHARED_PROJECTS_URL, makeHttpOptions('GET', {}, accessToken));
 	return res;
 };
 

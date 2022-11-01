@@ -67,7 +67,11 @@ const Navbar = () => {
 		<Fragment>
 			<div className='navbar__wrapper'>
 				<nav className='navbar'>
-					<select onChange={changeProjectType} className='custom-select'>
+					<select
+						value={isProjectShared ? 'Shared Projects' : 'My Projects'}
+						onChange={changeProjectType}
+						className='custom-select'
+					>
 						<option value='My Projects'>My Projects</option>
 						<option value='Shared Projects'>Shared Projects</option>
 					</select>
