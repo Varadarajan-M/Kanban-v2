@@ -8,6 +8,7 @@ import {
 	SHARED_PROJECTS_URL,
 	SHARE_PROJECT_URL,
 	FETCH_USERS_URL,
+	CLONE_PROJECT_URL,
 } from './constants';
 import { isStrNotFalsy } from '../lib';
 
@@ -136,4 +137,13 @@ export const shareProject = async (projectId, body, accessToken) => {
 export const fetchUsers = async (name, accessToken) => {
 	const res = await makeHttpReq(`${FETCH_USERS_URL}/?name=${name}`, makeHttpOptions('GET', {}, accessToken));
 	return res;
+};
+
+export const cloneProject = async (projectId, accessToken) => {
+	const res = await makeHttpReq(`${CLONE_PROJECT_URL}/${projectId}`, makeHttpOptions('POST', {}, accessToken));
+	return res;
+};
+export const fetchOneUser = async (userId, accessToken) => {
+	const res = await makeHttpReq(`${FETCH_USERS_URL}/${userId}`, makeHttpOptions('GET', {}, accessToken));
+	return res?.payload ?? undefined;
 };

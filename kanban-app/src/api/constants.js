@@ -21,3 +21,7 @@ export const SHARED_PROJECTS_URL = `${SHARED_URL}/fetch`;
 export const SHARE_PROJECT_URL = `${SHARED_URL}/share`;
 
 export const FETCH_USERS_URL = `${BASE_URL}/user/fetch`;
+
+export const CLONE_PROJECT_URL = `${BASE_URL}/clone`;
+
+

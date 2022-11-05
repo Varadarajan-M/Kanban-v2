@@ -20,3 +20,13 @@ exports.updateProjectWithSharedUsers = async function (req, res) {
 		sendError(res, cannotShareErr);
 	}
 };
+
+exports.cloneProject = async function (req, res) {
+	const resp = await SharedService.cloneProject(req.user.userID, req.params?.id);
+	if (resp.ok) {
+		sendSuccessPayload(res, resp.message, 201);
+	} else {
+		const cannotShareErr = throwError('Cannot clone project', 400);
+		sendError(res, cannotShareErr);
+	}
+};

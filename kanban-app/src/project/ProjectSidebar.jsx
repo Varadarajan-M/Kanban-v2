@@ -40,7 +40,7 @@ const ProjectSidebar = () => {
 
 	useEffect(() => {
 		if (cursor > -1 && inputRef?.current) {
-			inputRef.current.value = filteredList[cursor].name;
+			inputRef.current.value = filteredList[cursor]?.name ?? '';
 		}
 	}, [cursor]);
 

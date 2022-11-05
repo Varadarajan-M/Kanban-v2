@@ -14,6 +14,7 @@ import {
 	createProject,
 	updateProject,
 	deleteProject,
+	cloneProject,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty, removeKey, setValue } from '../lib';
@@ -249,6 +250,11 @@ const ProjectContextProvider = ({ children }) => {
 		setSaveState('enabled');
 	};
 
+	const cloneProjectApi = async () => {
+		const res = await cloneProject(activeProject, getUserToken());
+		isResOk(res) ? alert(res.payload) : alert(res.error.message);
+	};
+
 	useEffect(() => {
 		if (isNotFalsy(activeProject)) getProjectInfo(activeProject);
 	}, [activeProject]);
@@ -302,6 +308,7 @@ const ProjectContextProvider = ({ children }) => {
 				removeFromModifiedBoards,
 				isProjectShared,
 				setIsProjectShared,
+				cloneProjectApi,
 			}}
 		>
 			{children}

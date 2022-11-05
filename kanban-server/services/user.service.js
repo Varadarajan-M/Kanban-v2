@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { hashPassword, isStrFalsy, isPasswordMatching } = require('../helper');
+
 const User = require('../models/user.model');
 const ERROR_RESPONSE = {
 	ok: false,
@@ -55,6 +56,17 @@ exports.fetchUsers = async (name) => {
 			users = await User.find({ username: { $regex: name, $options: 'i' } }, selection);
 		}
 		return { ok: true, users };
+	} catch (e) {
+		console.log(e);
+		return ERROR_RESPONSE;
+	}
+};
+
+exports.getOneUser = async (userId) => {
+	try {
+		const selection = { username: 1 };
+		const user = await User.findOne({ _id: userId }, selection);
+		return { ok: true, user };
 	} catch (e) {
 		console.log(e);
 		return ERROR_RESPONSE;

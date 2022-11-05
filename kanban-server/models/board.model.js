@@ -10,8 +10,12 @@ const BoardSchema = new mongoose.Schema(
 			type: Number,
 		},
 		projectId: {
-			type:  mongoose.Schema.Types.ObjectId,
+			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Project',
+		},
+		userId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'User',
 		},
 	},
 	{ timestamps: true },
