@@ -7,6 +7,7 @@ const ProjectSidebar = () => {
 	const [searchItem, setSearchItem] = useState('');
 	const { getProjectList, projectList, projectDetails, switchProject, isProjectShared } = useProjectData();
 	const { showSidebar, toggleSidebar, closeSidebar, openSidebar } = useUI();
+	const projectItemRef = useRef(null);
 
 	const inputRef = useRef(null);
 
@@ -47,6 +48,12 @@ const ProjectSidebar = () => {
 		getProjectList?.();
 	}, [isProjectShared]);
 
+	useEffect(() => {
+		if (!!filteredList.length && cursor !== -1 && cursor < filteredList.length) {
+			projectItemRef.current?.scrollIntoView();
+		}
+	}, [cursor, filteredList]);
+
 	return (
 		<aside className='project__sidebar' style={{ left: showSidebar ? 0 : '-215px' }}>
 			<div className='search'>
@@ -72,10 +79,11 @@ const ProjectSidebar = () => {
 					{showSidebar ? 'arrow_back_ios' : 'arrow_forward_ios'}
 				</span>
 			</div>
-			<div className='project__list'>
+			<div className='project__list' style={{ paddingRight: 3 }}>
 				{!isArrayEmpty(filteredList) ? (
 					filteredList.map((filteredItem, idx) => (
 						<p
+							ref={idx === cursor ? projectItemRef : null}
 							style={{
 								color: idx === cursor ? '#4ea1ff' : '',
 								fontWeight: idx === cursor ? 'bold' : 'normal',

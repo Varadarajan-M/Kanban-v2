@@ -17,3 +17,7 @@ export const SAVE_PROJECT_URL = `${PROJECT_URL}/save`;
 export const SHARED_URL = `${BASE_URL}/shared`;
 
 export const SHARED_PROJECTS_URL = `${SHARED_URL}/fetch`;
+
+export const SHARE_PROJECT_URL = `${SHARED_URL}/share`;
+
+export const FETCH_USERS_URL = `${BASE_URL}/user/fetch`;

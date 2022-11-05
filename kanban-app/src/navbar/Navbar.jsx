@@ -182,12 +182,16 @@ const Navbar = () => {
 					open={shareModalOpen}
 					onBackdropClick={closeShareProjectModal}
 					title={`Share ${projectDetails?.name}`}
-					primaryButton={'Share'}
+					primaryButton={'Save'}
 					secondaryButton={'Discard'}
 					onSecondaryClick={closeShareProjectModal}
 				/>
 			</div>
-			{!isProjectShared ? <Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} /> : ''}
+			{!isProjectShared && !haveNoProjects ? (
+				<Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} />
+			) : (
+				''
+			)}
 		</Fragment>
 	);
 };
