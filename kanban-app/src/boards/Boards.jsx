@@ -115,7 +115,7 @@ const Boards = () => {
 
 	const taskEditSubmitHandler = (boardPos, task_id) => {
 		editTask(boardPos, task_id, taskEditTracker[task_id]);
-		addToModifiedBoards(boardPos);
+		// addToModifiedBoards(boardPos);
 		onTaskEditIconClick(task_id);
 		taskEditChangeHandler({ target: { value: '' } }, task_id);
 	};

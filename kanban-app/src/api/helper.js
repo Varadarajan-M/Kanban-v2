@@ -129,6 +129,11 @@ export const createTask = async (boardId, body, accessToken) => {
 	return res;
 };
 
+export const editTask = async (taskId, projectId, item, accessToken) => {
+	const res = await makeHttpReq(`${TASK_URL}/${taskId}/project/${projectId}`, makeHttpOptions('PUT', { item }, accessToken));
+	return res;
+};
+
 export const shareProject = async (projectId, body, accessToken) => {
 	const res = await makeHttpReq(`${SHARE_PROJECT_URL}/${projectId}`, makeHttpOptions('PUT', body, accessToken));
 	return res;

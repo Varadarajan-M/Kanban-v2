@@ -15,6 +15,7 @@ import {
 	updateProject,
 	deleteProject,
 	cloneProject,
+	editTask as editTaskApi,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty, removeKey, setValue } from '../lib';
@@ -218,8 +219,12 @@ const ProjectContextProvider = ({ children }) => {
 		setSaveState('enabled');
 	};
 
-	const editTask = (boardPosition, taskId, value) => {
+	const editTask = async (boardPosition, taskId, value) => {
 		if (isStrFalsy(value)) return;
+
+		const res = await editTaskApi(taskId, activeProject, value, getUserToken());
+
+		!isResOk(res) && alert(res.error.message ?? 'Something went wrong');
 
 		setProjectDetails((project) => ({
 			...project,
@@ -233,7 +238,7 @@ const ProjectContextProvider = ({ children }) => {
 				},
 			},
 		}));
-		setSaveState('enabled');
+		// setSaveState('enabled');
 	};
 
 	const updateListOrder = (key, taskArray) => {
