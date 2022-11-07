@@ -14,7 +14,9 @@ const TaskCard = ({ taskItem, onEditIconClick, onDeleteIconClick, isEditing, cha
 					<Icon className='saveChanges__icon' type='Done' onClick={onEditSubmit} tooltip={'Save Changes'} />
 				</div>
 			) : (
-				<span className='task__item'>{taskItem}</span>
+				<span style={{ marginRight: 18 }} className='task__item'>
+					{taskItem}
+				</span>
 			)}
 			{!isProjectShared && (
 				<Fragment>

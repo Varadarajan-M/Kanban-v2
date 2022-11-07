@@ -202,7 +202,9 @@ const Boards = () => {
 										>
 											<div className='board__header'>
 												<div className='board__left'>
-													<div className='board__items-length'>{column?.tasks?.length}</div>{' '}
+													<div className='board__items-length'>
+														<span>{column?.tasks?.length}</span>{' '}
+													</div>
 													{!isProjectShared && editingBoardIndexes.has(index) ? (
 														<div className='board__edit'>
 															<input

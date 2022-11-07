@@ -1,4 +1,15 @@
-import { LOGIN_URL, SIGN_UP_URL, PROJECT_URL, SAVE_PROJECT_URL, BOARD_URL, TASK_URL } from './constants';
+import {
+	LOGIN_URL,
+	SIGN_UP_URL,
+	PROJECT_URL,
+	SAVE_PROJECT_URL,
+	BOARD_URL,
+	TASK_URL,
+	SHARED_PROJECTS_URL,
+	SHARE_PROJECT_URL,
+	FETCH_USERS_URL,
+	CLONE_PROJECT_URL,
+} from './constants';
 import { isStrNotFalsy } from '../lib';
 
 // Local Storage
@@ -68,6 +79,10 @@ export const getAllProjects = async (accessToken) => {
 	const res = await makeHttpReq(PROJECT_URL, makeHttpOptions('GET', {}, accessToken));
 	return res;
 };
+export const getAllSharedProjects = async (accessToken) => {
+	const res = await makeHttpReq(SHARED_PROJECTS_URL, makeHttpOptions('GET', {}, accessToken));
+	return res;
+};
 
 export const getOneProject = async (projectId, accessToken) => {
 	const res = await makeHttpReq(`${PROJECT_URL}/${projectId}`, makeHttpOptions('GET', {}, accessToken));
@@ -94,6 +109,11 @@ export const deleteProject = async (projectId, accessToken) => {
 	return res;
 };
 
+export const getSharedUsers = async (projectId, accessToken) => {
+	const res = await makeHttpReq(`${PROJECT_URL}/${projectId}/sharedusers`, makeHttpOptions('GET', {}, accessToken));
+	return res;
+};
+
 export const createBoard = async (projectId, body, accessToken) => {
 	const res = await makeHttpReq(`${BOARD_URL}/${projectId}`, makeHttpOptions('POST', body, accessToken));
 	return res;
@@ -107,4 +127,23 @@ export const updateBoard = async (projectId, boardId, body, accessToken) => {
 export const createTask = async (boardId, body, accessToken) => {
 	const res = await makeHttpReq(`${TASK_URL}/${boardId}`, makeHttpOptions('POST', body, accessToken));
 	return res;
+};
+
+export const shareProject = async (projectId, body, accessToken) => {
+	const res = await makeHttpReq(`${SHARE_PROJECT_URL}/${projectId}`, makeHttpOptions('PUT', body, accessToken));
+	return res;
+};
+
+export const fetchUsers = async (name, accessToken) => {
+	const res = await makeHttpReq(`${FETCH_USERS_URL}/?name=${name}`, makeHttpOptions('GET', {}, accessToken));
+	return res;
+};
+
+export const cloneProject = async (projectId, accessToken) => {
+	const res = await makeHttpReq(`${CLONE_PROJECT_URL}/${projectId}`, makeHttpOptions('POST', {}, accessToken));
+	return res;
+};
+export const fetchOneUser = async (userId, accessToken) => {
+	const res = await makeHttpReq(`${FETCH_USERS_URL}/${userId}`, makeHttpOptions('GET', {}, accessToken));
+	return res?.payload ?? undefined;
 };

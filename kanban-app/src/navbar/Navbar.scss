@@ -21,6 +21,16 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 		flex-wrap: nowrap;
 		height: max(62px, 62px);
 
+		.display-owner {
+			.card {
+				box-shadow: 0 2px 5px 0 rgb(127 96 96 / 10%);
+				background: #161b22;
+				color: #ffffff;
+			}
+			width: max-content;
+			text-align: center;
+		}
+
 		button:disabled {
 			opacity: 0.4;
 			pointer-events: none;
@@ -107,11 +117,11 @@ $navTextColor: rgba(255, 255, 255, 0.75);
 				justify-content: center;
 				width: max-content;
 				box-shadow: 0 2px 5px 0 rgb(127 96 96 / 10%);
+				background: #161b22;
 				color: #ffffff;
 				padding: 0 10px;
 				border-radius: 6px;
 				border: none;
-				background: #161b22;
 				cursor: pointer;
 
 				opacity: 0;

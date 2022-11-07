@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const positionSchema = new mongoose.Schema(
   {
     id: {
-      type: mongoose.Types.ObjectId,
+      type:  mongoose.Schema.Types.ObjectId,
       required: true,
     },
     seq: { type: Number, default: 0 },

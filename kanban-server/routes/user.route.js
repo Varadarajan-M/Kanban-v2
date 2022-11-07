@@ -10,4 +10,7 @@ router.route("/register").post(UserValidator.register, UserController.register);
 router.route("/login").post(UserValidator.login, UserController.login);
 
 router.route("/fetch").get(verifyAuth, UserController.fetchUsers);
+
+router.route("/fetch/:id").get(verifyAuth, UserController.getOneUser);
+
 module.exports = router;

@@ -10,7 +10,7 @@ const ProjectSchema = new mongoose.Schema(
       default: 'Untitled project',
     },
     userId: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },

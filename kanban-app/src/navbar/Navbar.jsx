@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useCallback, Fragment } from 'react';
+import React, { useState, useMemo, useCallback, Fragment, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useProjectData } from '../hooks';
+import { useLog, useProjectData } from '../hooks';
 import { isArrayEmpty } from '../lib';
 import Modals from '../project/ProjectModals';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,7 @@ import Icon from '../common/Icon';
 import Avatar from '../common/Avatar';
 import { Menu, MenuContainer, MenuItem } from '../common/Menu';
 import './Navbar.scss';
+import { fetchOneUser,getUserToken } from '../api/helper';
 
 const Navbar = () => {
 	const [addOpen, setAddOpen] = useState(false);
@@ -22,8 +23,16 @@ const Navbar = () => {
 		},
 		clearAuthState,
 	} = useAuth();
-	const { saveState, saveChanges, projectDetails, projectList, removeProject, isProjectShared, setIsProjectShared } =
-		useProjectData();
+	const {
+		saveState,
+		saveChanges,
+		projectDetails,
+		projectList,
+		removeProject,
+		isProjectShared,
+		setIsProjectShared,
+		cloneProjectApi,
+	} = useProjectData();
 	const navigate = useNavigate();
 
 	const closeAddProjectModal = () => setAddOpen(false);
@@ -63,17 +72,63 @@ const Navbar = () => {
 		e.target.value !== 'My Projects' ? setIsProjectShared(true) : setIsProjectShared(false);
 	};
 
+	const [isCloning, setIsCloning] = useState(false);
+
+	const cloneProject = async () => {
+		setIsCloning(true);
+		await cloneProjectApi();
+		setIsProjectShared(false);
+		setIsCloning(false);
+	};
+
+	const [sharedProjectOwner, setSharedProjectOwner] = useState('User');
+
+	const projectOwner = projectDetails.userId ?? null;
+
+	useEffect(() => {
+		if (isProjectShared && projectOwner) {
+			fetchOneUser(projectOwner, getUserToken()).then((user) => {
+				user && setSharedProjectOwner(() => user.username);
+			});
+		}
+	}, [projectOwner]);
+
 	return (
 		<Fragment>
 			<div className='navbar__wrapper'>
 				<nav className='navbar'>
-					<select onChange={changeProjectType} className='custom-select'>
+					<select
+						value={isProjectShared ? 'Shared Projects' : 'My Projects'}
+						onChange={changeProjectType}
+						className='custom-select'
+					>
 						<option value='My Projects'>My Projects</option>
 						<option value='Shared Projects'>Shared Projects</option>
 					</select>
 					<span className='username hide-md'>{username ?? 'User'} / Kanban App</span>
 
 					<div className='nav__buttons'>
+						{!haveNoProjects && isProjectShared && (
+							<div className='d-flex align-center'>
+								<button className='btn new-project mr-2' onClick={cloneProject}>
+									{isCloning ? 'Cloning... ' : 'Clone'}
+								</button>
+								<div className='popover popover-bottom'>
+									<Icon className={'mr-2 mt-2'} type={'supervisor_account'} />
+									<div className='popover-container display-owner'>
+										<div className='card'>
+											<div className='card-body'>
+												<h6>
+													Shared by
+													<br />
+													{sharedProjectOwner}
+												</h6>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						)}
 						{!isProjectShared && (
 							<Fragment>
 								<button className='btn new-project' onClick={openAddProjectModal}>
@@ -178,12 +233,16 @@ const Navbar = () => {
 					open={shareModalOpen}
 					onBackdropClick={closeShareProjectModal}
 					title={`Share ${projectDetails?.name}`}
-					primaryButton={'Share'}
+					primaryButton={'Save'}
 					secondaryButton={'Discard'}
 					onSecondaryClick={closeShareProjectModal}
 				/>
 			</div>
-			{!isProjectShared ? <Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} /> : ''}
+			{!isProjectShared && !haveNoProjects ? (
+				<Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} />
+			) : (
+				''
+			)}
 		</Fragment>
 	);
 };
