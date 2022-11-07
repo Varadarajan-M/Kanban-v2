@@ -1,104 +1,142 @@
-const { isFalsy } = require('../helper');
-const SharedProjectUsers = require('../models/shared.project.users.model');
+const { isFalsy } = require("../helper");
+const SharedProjectUsers = require("../models/shared.project.users.model");
 const ERROR_RESPONSE = {
-	ok: false,
+  ok: false,
 };
-const mongoose = require('mongoose');
-const Board = require('../models/board.model');
-const ProjectService = require('./project.service');
-const Project = require('../models/project.model');
-const { Task } = require('../models/task.model');
+const mongoose = require("mongoose");
+const Board = require("../models/board.model");
+const ProjectService = require("./project.service");
+const Project = require("../models/project.model");
+const { Task } = require("../models/task.model");
 
-exports.isBoardOwner = async (userId, boardId) => !isFalsy(await Board.exists({ _id: boardId, userId }));
+exports.isBoardOwner = async (userId, boardId) =>
+  !isFalsy(await Board.exists({ _id: boardId, userId }));
 
 exports.fetchSharedProjects = async (userId) => {
-	try {
-		const projects = await SharedProjectUsers.aggregate([
-			{ $match: { users: { $in: [mongoose.Types.ObjectId(userId)] } } },
-			{
-				$project: { users: 0 },
-			},
-			{
-				$lookup: {
-					from: 'projects',
-					localField: 'projectId',
-					foreignField: '_id',
-					as: 'project',
-				},
-			},
-		]);
+  try {
+    const projects = await SharedProjectUsers.aggregate([
+      { $match: { users: { $in: [mongoose.Types.ObjectId(userId)] } } },
+      {
+        $project: { users: 0 },
+      },
+      {
+        $lookup: {
+          from: "projects",
+          localField: "projectId",
+          foreignField: "_id",
+          as: "project",
+        },
+      },
+    ]);
 
-		return { ok: true, projects: projects.map((p) => p.project[0]) };
-	} catch (e) {
-		console.log(e);
-		return ERROR_RESPONSE;
-	}
+    return { ok: true, projects: projects.map((p) => p.project[0]) };
+  } catch (e) {
+    console.log(e);
+    return ERROR_RESPONSE;
+  }
 };
 
 exports.updateProjectWithSharedUsers = async (userId, projectId, users) => {
-	try {
-		const projectOwner = await ProjectService.isProjectOwnerService(projectId, userId);
-		if (!projectOwner) return ERROR_RESPONSE;
+  try {
+    const projectOwner = await ProjectService.isProjectOwnerService(
+      projectId,
+      userId
+    );
+    if (!projectOwner) return ERROR_RESPONSE;
 
-		const res = await SharedProjectUsers.updateOne({ projectId }, { projectId, users }, { upsert: true });
-		return { ok: true, message: 'Shared Project Successfully' };
-	} catch (e) {
-		console.log(e);
-		return ERROR_RESPONSE;
-	}
+    const res = await SharedProjectUsers.updateOne(
+      { projectId },
+      { projectId, users },
+      { upsert: true }
+    );
+    return { ok: true, message: "Shared Project Successfully" };
+  } catch (e) {
+    console.log(e);
+    return ERROR_RESPONSE;
+  }
 };
 exports.deleteProjectWithSharedUsers = async (userId, projectId) => {
-	try {
-		const projectOwner = await ProjectService.isProjectOwnerService(projectId, userId);
-		if (!projectOwner) return ERROR_RESPONSE;
+  try {
+    const projectOwner = await ProjectService.isProjectOwnerService(
+      projectId,
+      userId
+    );
+    if (!projectOwner) return ERROR_RESPONSE;
 
-		const res = await SharedProjectUsers.deleteMany({ projectId });
-		return { ok: true, stauts: 201, res };
-	} catch (e) {
-		console.log(e);
-		return ERROR_RESPONSE;
-	}
+    const res = await SharedProjectUsers.deleteMany({ projectId });
+    return { ok: true, stauts: 201, res };
+  } catch (e) {
+    console.log(e);
+    return ERROR_RESPONSE;
+  }
 };
 
 exports.cloneProject = async (userId, projectId) => {
-	try {
-		const sharedUser = await SharedProjectUsers.exists({
-			projectId,
-			users: { $in: [mongoose.Types.ObjectId(userId)] },
-		});
+  try {
+    const sharedUser = await SharedProjectUsers.exists({
+      projectId,
+      users: { $in: [mongoose.Types.ObjectId(userId)] },
+    });
 
-		if (!sharedUser) return ERROR_RESPONSE;
+    if (!sharedUser) return ERROR_RESPONSE;
 
-		const res = await ProjectService.getOne(projectId, userId);
+    const res = await ProjectService.getOne(projectId, userId);
 
-		const projectDetails = res.ok && res.data;
+    const projectDetails = res.ok && res.data;
 
-		const clone = await ProjectService.create({ name: `${projectDetails.name}_cloned` }, userId);
+    const clone = await ProjectService.create(
+      { name: `${projectDetails.name}_cloned` },
+      userId
+    );
 
-		const boards = Object.values(projectDetails.boards);
+    const boards = Object.values(projectDetails.boards);
 
-		const newBoards = boards.map((board) => ({
-			name: board.name,
-			projectId: clone.project._id,
-			position: board.position ?? 0,
-			userId,
-		}));
+    const newBoards = boards.map((board) => ({
+      name: board.name,
+      projectId: clone.project._id,
+      position: board.position ?? 0,
+      userId,
+    }));
 
-		const insertedBoards = await Board.insertMany(newBoards);
+    const insertedBoards = await Board.insertMany(newBoards);
 
-		for (const [index, board] of insertedBoards.entries()) {
-			const newTasks = boards[index].tasks?.map((task) => ({
-				item: task.item,
-				boardId: board._id,
-				userId,
-				position: task.position,
-			}));
+    for (const [index, board] of insertedBoards.entries()) {
+      const newTasks = boards[index].tasks?.map((task) => ({
+        item: task.item,
+        boardId: board._id,
+        userId,
+        position: task.position,
+      }));
 
-			!!newTasks.length && (await Task.insertMany(newTasks));
-		}
-		return { ok: true, message: 'Cloned successfully' };
-	} catch (e) {
-		console.log(e);
-		return ERROR_RESPONSE;
-	}
+      !!newTasks.length && (await Task.insertMany(newTasks));
+    }
+    return { ok: true, message: "Cloned successfully" };
+  } catch (e) {
+    console.log(e);
+    return ERROR_RESPONSE;
+  }
+};
+
+exports.removeProject = async (userId, projectId) => {
+  try {
+    let currentResults;
+    currentResults = await SharedProjectUsers.findOne({ projectId });
+    if (currentResults.length <= 0) {
+      return ERROR_RESPONSE;
+    }
+    let users = currentResults[0].users.filter((item) => {
+      if (!item === userId) {
+        return item;
+      }
+    });
+    currentResults[0].users = users;
+    const res = await SharedProjectUsers.findOneAndUpdate(
+      { projectId },
+      { ...currentResults[0] }
+    );
+    return { ok: true, stauts: 201, res };
+  } catch (e) {
+    console.log(e);
+    return ERROR_RESPONSE;
+  }
 };
