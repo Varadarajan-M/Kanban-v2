@@ -152,3 +152,8 @@ export const fetchOneUser = async (userId, accessToken) => {
 	const res = await makeHttpReq(`${FETCH_USERS_URL}/${userId}`, makeHttpOptions('GET', {}, accessToken));
 	return res?.payload ?? undefined;
 };
+
+export const unshareProject = async (projectId, accessToken) => {
+	const res = await makeHttpReq(`${SHARE_PROJECT_URL}/${projectId}`, makeHttpOptions('DELETE', {}, accessToken));
+	return res;
+};

@@ -16,6 +16,7 @@ import {
 	deleteProject,
 	cloneProject,
 	editTask as editTaskApi,
+	unshareProject as unshareProjectApi,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty, removeKey, setValue } from '../lib';
@@ -88,7 +89,7 @@ const ProjectContextProvider = ({ children }) => {
 		}
 	};
 
-	const removeProject = async () => {
+	const updateFocus = () => {
 		const deletedProjectIdx = projectList.map((p) => p._id).indexOf(projectDetails._id);
 
 		setProjectList((prevProjectList) => prevProjectList.filter((_, index) => index !== deletedProjectIdx));
@@ -96,7 +97,10 @@ const ProjectContextProvider = ({ children }) => {
 		let currentFocus = deletedProjectIdx === 0 ? deletedProjectIdx + 1 : deletedProjectIdx - 1;
 
 		projectList.length > 1 ? setActiveProject(projectList[currentFocus]._id) : setActiveProject(null);
+	};
 
+	const removeProject = async () => {
+		updateFocus();
 		const res = await deleteProject(projectDetails._id, getUserToken());
 	};
 
@@ -260,6 +264,14 @@ const ProjectContextProvider = ({ children }) => {
 		isResOk(res) ? alert(res.payload) : alert(res.error.message);
 	};
 
+	const unshareProject = async () => {
+		if (window.confirm('Are you sure?')) {
+			const res = await unshareProjectApi(projectDetails._id, getUserToken());
+			updateFocus();
+		}
+		return;
+	};
+
 	useEffect(() => {
 		if (isNotFalsy(activeProject)) getProjectInfo(activeProject);
 	}, [activeProject]);
@@ -314,6 +326,7 @@ const ProjectContextProvider = ({ children }) => {
 				isProjectShared,
 				setIsProjectShared,
 				cloneProjectApi,
+				unshareProject,
 			}}
 		>
 			{children}
