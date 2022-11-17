@@ -8,6 +8,7 @@ import { isFalsy, removeAndAddToList, reorderList } from '../lib';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import Loader from '../common/Loader';
 import { toggleElementFromSet } from './helper';
+import EmptyMessage from '../common/EmptyMessage';
 const Boards = () => {
 	const [activeBoardIndexes, setActiveBoardIndexes] = useState(new Set([]));
 	const [editingBoardIndexes, setEditingBoardIndexes] = useState(new Set([]));
@@ -35,7 +36,8 @@ const Boards = () => {
 
 	const { isLoading, showSidebar } = useUI();
 
-	const onAddIconClick = (index) => toggleElementFromSet(activeBoardIndexes, index, setActiveBoardIndexes);
+	const onAddIconClick = (index) =>
+		toggleElementFromSet(activeBoardIndexes, index, setActiveBoardIndexes);
 
 	const onEditIconClick = (index, boardPos) => {
 		toggleElementFromSet(editingBoardIndexes, index, setEditingBoardIndexes);
@@ -104,7 +106,8 @@ const Boards = () => {
 		deleteTaskContext(task, boardPosition);
 	};
 
-	const onTaskEditIconClick = (taskId) => toggleElementFromSet(editingTaskIndexes, taskId, setEditingTaskIndexes);
+	const onTaskEditIconClick = (taskId) =>
+		toggleElementFromSet(editingTaskIndexes, taskId, setEditingTaskIndexes);
 
 	const taskEditChangeHandler = (e, task_id) => {
 		setTaskEditTracker((tracker) => ({
@@ -127,10 +130,17 @@ const Boards = () => {
 		const destination = e.destination;
 		if (!destination) return;
 
-		if (source.droppableId === destination.droppableId && source.index !== destination.index) {
+		if (
+			source.droppableId === destination.droppableId &&
+			source.index !== destination.index
+		) {
 			const destinationBoardPosition = destination.droppableId;
 			const tasks = [...projectDetails.boards[destinationBoardPosition].tasks];
-			const reorderedTasks = reorderList([...tasks], destination.index, tasks[source.index]);
+			const reorderedTasks = reorderList(
+				[...tasks],
+				destination.index,
+				tasks[source.index],
+			);
 			addToModifiedBoards(destinationBoardPosition);
 			updateListOrder(destinationBoardPosition, reorderedTasks);
 		} else if (source.droppableId !== destination.droppableId) {
@@ -141,11 +151,19 @@ const Boards = () => {
 			const destinationBoardPosition = destination.droppableId;
 
 			const sourceList = [...projectDetails.boards[sourceBoardPosition].tasks];
-			const destinationList = [...projectDetails.boards[destinationBoardPosition].tasks];
+			const destinationList = [
+				...projectDetails.boards[destinationBoardPosition].tasks,
+			];
 
-			sourceList[sourceIndex].boardId = projectDetails.boards[destinationBoardPosition]._id;
+			sourceList[sourceIndex].boardId =
+				projectDetails.boards[destinationBoardPosition]._id;
 
-			const modifiedList = removeAndAddToList(sourceList, destinationList, destinationIndex, sourceList[sourceIndex]);
+			const modifiedList = removeAndAddToList(
+				sourceList,
+				destinationList,
+				destinationIndex,
+				sourceList[sourceIndex],
+			);
 
 			addToModifiedBoards(sourceBoardPosition);
 			addToModifiedBoards(destinationBoardPosition);
@@ -159,13 +177,11 @@ const Boards = () => {
 
 	if (isFalsy(activeProject)) {
 		return (
-			<div
+			<EmptyMessage
 				style={{
 					height: '100%',
-					width: '100%',
 					display: 'grid',
 					placeItems: 'center',
-					letterSpacing: '1px',
 				}}
 			>
 				<h4
@@ -174,119 +190,161 @@ const Boards = () => {
 					}}
 				>
 					No Projects Available!
-					<p className='mt-1'>
-						Click <strong> New </strong> to add one.
-					</p>
+					{!isProjectShared && (
+						<p className='mt-1'>
+							Click <strong> New </strong> to add one.
+						</p>
+					)}
 				</h4>
-			</div>
+			</EmptyMessage>
 		);
 	}
 
 	return (
 		<DragDropContext onDragEnd={onDragEnd}>
-			<div className='boards-wrapper' style={{ marginLeft: showSidebar ? '275px' : '35px' }}>
+			<div
+				className='boards-wrapper'
+				style={{ marginLeft: showSidebar ? '275px' : '35px' }}
+			>
 				{!isLoading ? (
 					<Fragment>
-						{Object.entries(projectDetails?.boards ?? {}).map(([boardPos, column], index) => {
-							return (
-								<Droppable key={column._id} droppableId={boardPos}>
-									{(provided, snapshot) => (
-										<div
-											tabIndex={column._id}
-											className='board'
-											{...provided.droppableProps}
-											ref={provided.innerRef}
-											style={{
-												border: snapshot.isDraggingOver ? '2px solid cyan' : '',
-											}}
-										>
-											<div className='board__header'>
-												<div className='board__left'>
-													<div className='board__items-length'>
-														<span>{column?.tasks?.length}</span>{' '}
-													</div>
-													{!isProjectShared && editingBoardIndexes.has(index) ? (
-														<div className='board__edit'>
-															<input
-																onChange={(e) => boardNamesChangeHandler(e, boardPos)}
-																defaultValue={column?.name}
-															/>
-															<Icon
-																type={'Done'}
-																onClick={() => boardNamesEditHandler(boardPos, index)}
-															/>
+						{Object.entries(projectDetails?.boards ?? {}).map(
+							([boardPos, column], index) => {
+								return (
+									<Droppable key={column._id} droppableId={boardPos}>
+										{(provided, snapshot) => (
+											<div
+												tabIndex={column._id}
+												className='board'
+												{...provided.droppableProps}
+												ref={provided.innerRef}
+												style={{
+													border: snapshot.isDraggingOver
+														? '2px solid cyan'
+														: '',
+												}}
+											>
+												<div className='board__header'>
+													<div className='board__left'>
+														<div className='board__items-length'>
+															<span>{column?.tasks?.length}</span>{' '}
 														</div>
-													) : (
-														<span>{column.name}</span>
-													)}
-												</div>
-												{!isProjectShared && (
-													<div className='board__right'>
-														<Icon
-															onClick={() => onAddIconClick(index)}
-															type={activeBoardIndexes.has(index) ? 'remove' : 'add'}
-															tooltip={'Add a new item to the board'}
-														/>
-														<Icon
-															onClick={() => onEditIconClick(index, boardPos)}
-															type={editingBoardIndexes.has(index) ? 'close' : 'edit'}
-															tooltip={'Edit board name'}
-														/>
-														<Icon
-															onClick={() => onBoardDelete(column._id, boardPos)}
-															type='delete'
-															tooltip={'Delete board'}
-														/>
-													</div>
-												)}
-											</div>
-
-											<div className='board__tasks'>
-												{activeBoardIndexes.has(index) ? (
-													<BasicAddForm
-														value={inputs[boardPos] ?? ''}
-														changeHandler={(e) => addNewTaskChangeHandler(e, boardPos)}
-														placeholder={'Enter task item'}
-														onAddClick={() => addNewTaskSubmitHandler(boardPos, index)}
-														onCancelClick={() => onAddIconClick(index)}
-													/>
-												) : (
-													''
-												)}
-
-												{column?.tasks?.map((task, idx) => (
-													<Draggable key={task._id} draggableId={task._id} index={idx}>
-														{(provided, snapshot) => (
-															<div
-																{...provided.draggableProps}
-																{...provided.dragHandleProps}
-																ref={provided.innerRef}
-																style={{
-																	...provided.draggableProps.style,
-																}}
-															>
-																<TaskCard
-																	style={{
-																		border: snapshot.isDragging ? '2px solid orangered' : '',
-																	}}
-																	taskItem={task?.item}
-																	isEditing={editingTaskIndexes.has(task._id)}
-																	onEditIconClick={() => onTaskEditIconClick(task._id)}
-																	onEditSubmit={() => taskEditSubmitHandler(boardPos, task._id)}
-																	onDeleteIconClick={() => deleteTask(task, boardPos)}
-																	changeHandler={(e) => taskEditChangeHandler(e, task._id)}
+														{!isProjectShared &&
+														editingBoardIndexes.has(index) ? (
+															<div className='board__edit'>
+																<input
+																	onChange={(e) =>
+																		boardNamesChangeHandler(e, boardPos)
+																	}
+																	defaultValue={column?.name}
+																/>
+																<Icon
+																	type={'Done'}
+																	onClick={() =>
+																		boardNamesEditHandler(boardPos, index)
+																	}
 																/>
 															</div>
+														) : (
+															<span>{column.name}</span>
 														)}
-													</Draggable>
-												))}
+													</div>
+													{!isProjectShared && (
+														<div className='board__right'>
+															<Icon
+																onClick={() => onAddIconClick(index)}
+																type={
+																	activeBoardIndexes.has(index)
+																		? 'remove'
+																		: 'add'
+																}
+																tooltip={'Add a new item to the board'}
+															/>
+															<Icon
+																onClick={() => onEditIconClick(index, boardPos)}
+																type={
+																	editingBoardIndexes.has(index)
+																		? 'close'
+																		: 'edit'
+																}
+																tooltip={'Edit board name'}
+															/>
+															<Icon
+																onClick={() =>
+																	onBoardDelete(column._id, boardPos)
+																}
+																type='delete'
+																tooltip={'Delete board'}
+															/>
+														</div>
+													)}
+												</div>
+
+												<div className='board__tasks'>
+													{activeBoardIndexes.has(index) ? (
+														<BasicAddForm
+															value={inputs[boardPos] ?? ''}
+															changeHandler={(e) =>
+																addNewTaskChangeHandler(e, boardPos)
+															}
+															placeholder={'Enter task item'}
+															onAddClick={() =>
+																addNewTaskSubmitHandler(boardPos, index)
+															}
+															onCancelClick={() => onAddIconClick(index)}
+														/>
+													) : (
+														''
+													)}
+
+													{column?.tasks?.map((task, idx) => (
+														<Draggable
+															key={task._id}
+															draggableId={task._id}
+															index={idx}
+														>
+															{(provided, snapshot) => (
+																<div
+																	{...provided.draggableProps}
+																	{...provided.dragHandleProps}
+																	ref={provided.innerRef}
+																	style={{
+																		...provided.draggableProps.style,
+																	}}
+																>
+																	<TaskCard
+																		style={{
+																			border: snapshot.isDragging
+																				? '2px solid orangered'
+																				: '',
+																		}}
+																		taskItem={task?.item}
+																		isEditing={editingTaskIndexes.has(task._id)}
+																		onEditIconClick={() =>
+																			onTaskEditIconClick(task._id)
+																		}
+																		onEditSubmit={() =>
+																			taskEditSubmitHandler(boardPos, task._id)
+																		}
+																		onDeleteIconClick={() =>
+																			deleteTask(task, boardPos)
+																		}
+																		changeHandler={(e) =>
+																			taskEditChangeHandler(e, task._id)
+																		}
+																	/>
+																</div>
+															)}
+														</Draggable>
+													))}
+												</div>
+												<div>{provided.placeholder}</div>
 											</div>
-											<div>{provided.placeholder}</div>
-										</div>
-									)}
-								</Droppable>
-							);
-						})}
+										)}
+									</Droppable>
+								);
+							},
+						)}
 
 						{!isProjectShared && (
 							<div className='board add__new'>
@@ -313,6 +371,21 @@ const Boards = () => {
 					<Loader />
 				)}
 			</div>
+			{isProjectShared && !!!Object.keys(projectDetails?.boards ?? {}).length && (
+				<EmptyMessage
+					style={{
+						marginLeft: showSidebar ? 120 : 0,
+					}}
+				>
+					<h4
+						style={{
+							fontWeight: 300,
+						}}
+					>
+						No Boards Available!
+					</h4>
+				</EmptyMessage>
+			)}
 		</DragDropContext>
 	);
 };
