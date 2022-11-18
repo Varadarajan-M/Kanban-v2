@@ -1,6 +1,4 @@
-// export const BASE_URL = 'https://kanban-app-v1.herokuapp.com/api';
-
-export const BASE_URL = 'http://localhost:3000/api';
+export const BASE_URL = 'https://kanban-v2.up.railway.app/api';
 
 export const LOGIN_URL = `${BASE_URL}/user/login`;
 
@@ -23,5 +21,3 @@ export const SHARE_PROJECT_URL = `${SHARED_URL}/share`;
 export const FETCH_USERS_URL = `${BASE_URL}/user/fetch`;
 
 export const CLONE_PROJECT_URL = `${BASE_URL}/clone`;
-
-
