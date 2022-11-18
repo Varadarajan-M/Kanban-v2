@@ -15,6 +15,8 @@ import {
 	updateProject,
 	deleteProject,
 	cloneProject,
+	editTask as editTaskApi,
+	unshareProject as unshareProjectApi,
 } from '../api/helper';
 
 import { isStrFalsy, isArrayEmpty, removeKey, setValue } from '../lib';
@@ -87,7 +89,7 @@ const ProjectContextProvider = ({ children }) => {
 		}
 	};
 
-	const removeProject = async () => {
+	const updateFocus = () => {
 		const deletedProjectIdx = projectList.map((p) => p._id).indexOf(projectDetails._id);
 
 		setProjectList((prevProjectList) => prevProjectList.filter((_, index) => index !== deletedProjectIdx));
@@ -95,7 +97,10 @@ const ProjectContextProvider = ({ children }) => {
 		let currentFocus = deletedProjectIdx === 0 ? deletedProjectIdx + 1 : deletedProjectIdx - 1;
 
 		projectList.length > 1 ? setActiveProject(projectList[currentFocus]._id) : setActiveProject(null);
+	};
 
+	const removeProject = async () => {
+		updateFocus();
 		const res = await deleteProject(projectDetails._id, getUserToken());
 	};
 
@@ -218,8 +223,12 @@ const ProjectContextProvider = ({ children }) => {
 		setSaveState('enabled');
 	};
 
-	const editTask = (boardPosition, taskId, value) => {
+	const editTask = async (boardPosition, taskId, value) => {
 		if (isStrFalsy(value)) return;
+
+		const res = await editTaskApi(taskId, activeProject, value, getUserToken());
+
+		!isResOk(res) && alert(res.error.message ?? 'Something went wrong');
 
 		setProjectDetails((project) => ({
 			...project,
@@ -233,7 +242,7 @@ const ProjectContextProvider = ({ children }) => {
 				},
 			},
 		}));
-		setSaveState('enabled');
+		// setSaveState('enabled');
 	};
 
 	const updateListOrder = (key, taskArray) => {
@@ -253,6 +262,14 @@ const ProjectContextProvider = ({ children }) => {
 	const cloneProjectApi = async () => {
 		const res = await cloneProject(activeProject, getUserToken());
 		isResOk(res) ? alert(res.payload) : alert(res.error.message);
+	};
+
+	const unshareProject = async () => {
+		if (window.confirm('Are you sure?')) {
+			const res = await unshareProjectApi(projectDetails._id, getUserToken());
+			updateFocus();
+		}
+		return;
 	};
 
 	useEffect(() => {
@@ -309,6 +326,7 @@ const ProjectContextProvider = ({ children }) => {
 				isProjectShared,
 				setIsProjectShared,
 				cloneProjectApi,
+				unshareProject,
 			}}
 		>
 			{children}

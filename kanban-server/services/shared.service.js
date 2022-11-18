@@ -102,3 +102,31 @@ exports.cloneProject = async (userId, projectId) => {
 		return ERROR_RESPONSE;
 	}
 };
+
+exports.removeProject = async (userId, projectId) => {
+	try {
+		const sharedUser = await SharedProjectUsers.exists({
+			projectId,
+			users: { $in: [mongoose.Types.ObjectId(userId)] },
+		});
+
+		if (!sharedUser) return ERROR_RESPONSE;
+
+		let currentResults;
+		currentResults = await SharedProjectUsers.find({ projectId });
+		if (currentResults.length <= 0) {
+			return ERROR_RESPONSE;
+		}
+		let users = currentResults[0].users.filter((item) => {
+			if (!item === userId) {
+				return item;
+			}
+		});
+		currentResults[0].users = users;
+		const res = await SharedProjectUsers.findOneAndUpdate({ projectId }, { ...currentResults[0] });
+		return { ok: true, message: 'You got removed successfully' };
+	} catch (e) {
+		console.log(e);
+		return ERROR_RESPONSE;
+	}
+};

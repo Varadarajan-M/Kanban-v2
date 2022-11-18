@@ -8,7 +8,7 @@ import Icon from '../common/Icon';
 import Avatar from '../common/Avatar';
 import { Menu, MenuContainer, MenuItem } from '../common/Menu';
 import './Navbar.scss';
-import { fetchOneUser,getUserToken } from '../api/helper';
+import { fetchOneUser, getUserToken } from '../api/helper';
 
 const Navbar = () => {
 	const [addOpen, setAddOpen] = useState(false);
@@ -32,6 +32,7 @@ const Navbar = () => {
 		isProjectShared,
 		setIsProjectShared,
 		cloneProjectApi,
+		unshareProject,
 	} = useProjectData();
 	const navigate = useNavigate();
 
@@ -240,6 +241,16 @@ const Navbar = () => {
 			</div>
 			{!isProjectShared && !haveNoProjects ? (
 				<Icon onClick={toggleShareProjectModal} className={'shareIcon'} type={'share'} />
+			) : (
+				''
+			)}
+			{isProjectShared && !haveNoProjects ? (
+				<Icon
+					tooltip={`Remove ${projectDetails?.name} from shared projects`}
+					onClick={unshareProject}
+					className={'unshareIcon'}
+					type={'delete_sweep'}
+				/>
 			) : (
 				''
 			)}
