@@ -10,23 +10,25 @@ const ERROR_RESPONSE = {
 	ok: false,
 };
 
-const isProjectOwner = async (projectId, userId) => !isFalsy(await Project.exists({ _id: projectId, userId }));
+const isProjectOwner = async (projectId, userId) =>
+	!isFalsy(await Project.exists({ _id: projectId, userId }));
 
 const formatProject = (data) => {
-	let projectDetails = {};
-	Object.keys(data).forEach((key) => {
-		if (key !== 'boardInfo' && key !== 'taskInfo') projectDetails[key] = data[key];
-	});
 	const boards = Object.fromEntries(
 		data.boardInfo.map((board) => {
 			board.tasks = sortBy(
-				data.taskInfo.filter((task) => task.boardId?.toString() === board._id?.toString()),
+				data.taskInfo.filter(
+					(task) => task.boardId?.toString() === board._id?.toString(),
+				),
 				'position',
 			);
 			return [board.position, board];
 		}),
 	);
-	return { ...projectDetails, boards };
+	data.boards = boards;
+	delete data['boardInfo'];
+	delete data['taskInfo'];
+	return data;
 };
 
 exports.isProjectOwnerService = isProjectOwner;
@@ -104,7 +106,10 @@ exports.update = async function (projectId, { name }, userId) {
 
 	if (!projectOwner) return ERROR_RESPONSE;
 	try {
-		const updatedData = await Project.updateOne({ _id: projectId, userId }, { name, userId });
+		const updatedData = await Project.updateOne(
+			{ _id: projectId, userId },
+			{ name, userId },
+		);
 		if (updatedData.modifiedCount > 0) {
 			return { ok: true, message: 'Updated successfully' };
 		}
@@ -119,7 +124,9 @@ exports.delete = async function (projectId, userId) {
 	if (!projectOwner) return ERROR_RESPONSE;
 
 	try {
-		const boards = (await Board.find({ projectId, userId }, { _id: 1 }).lean()).map((b) => b._id);
+		const boards = (
+			await Board.find({ projectId, userId }, { _id: 1 }).lean()
+		).map((b) => b._id);
 		await Promise.all([
 			SharedService.deleteProjectWithSharedUsers(userId, projectId),
 			Board.deleteMany({ projectId, userId }),
@@ -136,7 +143,12 @@ exports.delete = async function (projectId, userId) {
 	}
 };
 
-exports.saveChanges = async function (updatedTasks, deletedStack, userId, projectId) {
+exports.saveChanges = async function (
+	updatedTasks,
+	deletedStack,
+	userId,
+	projectId,
+) {
 	const projectOwner = await isProjectOwner(projectId, userId);
 	if (!projectOwner) return ERROR_RESPONSE;
 
@@ -170,7 +182,10 @@ exports.getSharedUsers = async function (projectId, userId) {
 	try {
 		const projectOwner = await isProjectOwner(projectId, userId);
 		if (!projectOwner) return ERROR_RESPONSE;
-		const users = await SharedProjectUsers.find({ projectId }).populate('users', '-hash');
+		const users = await SharedProjectUsers.find({ projectId }).populate(
+			'users',
+			'-hash',
+		);
 		return {
 			ok: true,
 			users,
