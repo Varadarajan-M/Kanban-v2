@@ -9,7 +9,8 @@ const ProjectService = require('./project.service');
 const Project = require('../models/project.model');
 const { Task } = require('../models/task.model');
 
-exports.isBoardOwner = async (userId, boardId) => !isFalsy(await Board.exists({ _id: boardId, userId }));
+exports.isBoardOwner = async (userId, boardId) =>
+	!isFalsy(await Board.exists({ _id: boardId, userId }));
 
 exports.fetchSharedProjects = async (userId) => {
 	try {
@@ -37,10 +38,17 @@ exports.fetchSharedProjects = async (userId) => {
 
 exports.updateProjectWithSharedUsers = async (userId, projectId, users) => {
 	try {
-		const projectOwner = await ProjectService.isProjectOwnerService(projectId, userId);
+		const projectOwner = await ProjectService.isProjectOwnerService(
+			projectId,
+			userId,
+		);
 		if (!projectOwner) return ERROR_RESPONSE;
 
-		const res = await SharedProjectUsers.updateOne({ projectId }, { projectId, users }, { upsert: true });
+		const res = await SharedProjectUsers.updateOne(
+			{ projectId },
+			{ projectId, users },
+			{ upsert: true },
+		);
 		return { ok: true, message: 'Shared Project Successfully' };
 	} catch (e) {
 		console.log(e);
@@ -49,7 +57,10 @@ exports.updateProjectWithSharedUsers = async (userId, projectId, users) => {
 };
 exports.deleteProjectWithSharedUsers = async (userId, projectId) => {
 	try {
-		const projectOwner = await ProjectService.isProjectOwnerService(projectId, userId);
+		const projectOwner = await ProjectService.isProjectOwnerService(
+			projectId,
+			userId,
+		);
 		if (!projectOwner) return ERROR_RESPONSE;
 
 		const res = await SharedProjectUsers.deleteMany({ projectId });
@@ -73,7 +84,10 @@ exports.cloneProject = async (userId, projectId) => {
 
 		const projectDetails = res.ok && res.data;
 
-		const clone = await ProjectService.create({ name: `${projectDetails.name}_cloned` }, userId);
+		const clone = await ProjectService.create(
+			{ name: `${projectDetails.name}_cloned` },
+			userId,
+		);
 
 		const boards = Object.values(projectDetails.boards);
 
@@ -112,19 +126,14 @@ exports.removeProject = async (userId, projectId) => {
 
 		if (!sharedUser) return ERROR_RESPONSE;
 
-		let currentResults;
-		currentResults = await SharedProjectUsers.find({ projectId });
-		if (currentResults.length <= 0) {
-			return ERROR_RESPONSE;
-		}
-		let users = currentResults[0].users.filter((item) => {
-			if (!item === userId) {
-				return item;
-			}
-		});
-		currentResults[0].users = users;
-		const res = await SharedProjectUsers.findOneAndUpdate({ projectId }, { ...currentResults[0] });
-		return { ok: true, message: 'You got removed successfully' };
+		const res = await SharedProjectUsers.updateOne(
+			{ projectId },
+			{ $pull: { users: mongoose.Types.ObjectId(userId) } },
+		);
+
+		return res?.modifiedCount > 0
+			? { ok: true, message: 'You got removed successfully' }
+			: ERROR_RESPONSE;
 	} catch (e) {
 		console.log(e);
 		return ERROR_RESPONSE;
